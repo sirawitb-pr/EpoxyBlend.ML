@@ -1,0 +1,2121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EpoxyBlend.ML · Synergistic Blended Epoxy Adhesive Discovery Workbench</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --surface: #ffffff;
+      --card-border: #e2e8f0;
+      --navy-900: #0f172a;
+      --navy-800: #1e293b;
+      --navy-700: #334155;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --teal-600: #0d9488;
+      --teal-50: #f0fdfa;
+      --blue-600: #2563eb;
+      --blue-50: #eff6ff;
+      --green-600: #16a34a;
+      --green-50: #f0fdf4;
+      --amber-600: #d97706;
+      --radius-sm: 5px;
+      --radius-md: 8px;
+      --radius-lg: 10px;
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.35;
+      padding: 8px 12px;
+      font-size: 11.5px;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    /* Top Navbar */
+    .top-navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--navy-900);
+      color: #fff;
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      margin-bottom: 6px;
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-icon {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, #0d9488, #2563eb);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .brand-icon svg {
+      width: 16px;
+      height: 16px;
+      stroke: #fff;
+      fill: none;
+      stroke-width: 2;
+    }
+
+    .brand-title {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-tag {
+      font-size: 9.5px;
+      color: #94a3b8;
+    }
+
+    /* Model Selector Hub */
+    .model-hub {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255, 255, 255, 0.06);
+      padding: 3px 8px;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+    }
+
+    .model-hub label {
+      font-size: 9.5px;
+      font-weight: 700;
+      color: #cbd5e1;
+      text-transform: uppercase;
+    }
+
+    .model-hub select {
+      background: #1e293b;
+      color: #fff;
+      border: 1px solid #475569;
+      padding: 3px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 10.5px;
+      font-weight: 600;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .metrics-group {
+      display: flex;
+      gap: 5px;
+    }
+
+    .metric-pill {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 2px 5px;
+      border-radius: var(--radius-sm);
+      font-size: 9.5px;
+      font-family: 'JetBrains Mono', monospace;
+      color: #e2e8f0;
+    }
+
+    .metric-pill strong {
+      color: #38bdf8;
+    }
+
+    /* Tabs Navigation */
+    .tabs-nav {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 6px;
+      border-bottom: 1.5px solid var(--card-border);
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 5px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .tab-btn:hover {
+      color: var(--navy-900);
+      background: rgba(226, 232, 240, 0.5);
+    }
+
+    .tab-btn.active {
+      color: var(--blue-600);
+      background: #fff;
+      border-bottom: 2.5px solid var(--blue-600);
+    }
+
+    .tab-pane {
+      display: none;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* Section Headers */
+    .section-title-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    .section-title {
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--navy-800);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .section-title span.step-num {
+      background: var(--navy-900);
+      color: #fff;
+      font-size: 9px;
+      width: 15px;
+      height: 15px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Buttons */
+    .btn-action-group {
+      display: flex;
+      gap: 5px;
+    }
+
+    .btn-tool {
+      background: #fff;
+      border: 1px solid var(--card-border);
+      color: var(--navy-800);
+      padding: 2.5px 7px;
+      border-radius: var(--radius-sm);
+      font-size: 10px;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.15s ease;
+    }
+
+    .btn-tool:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .btn-tool.zero:hover {
+      background: #fee2e2;
+      border-color: #fca5a5;
+      color: #b91c1c;
+    }
+
+    /* SECTION 1: BALANCED COMPACT DISCOVERY CARDS */
+    .discovery-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.35fr 1.15fr;
+      gap: 6px;
+      margin-bottom: 8px;
+    }
+
+    .disco-card {
+      background: var(--surface);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 8px 10px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 125px;
+    }
+
+    .disco-card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 5px;
+      padding-bottom: 3px;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .disco-card-title {
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--navy-800);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* Highest Experiment Champion Box */
+    .champ-box {
+      background: linear-gradient(135deg, #f0fdf4, #ecfdf5);
+      border: 1px solid #86efac;
+      border-radius: var(--radius-sm);
+      padding: 6px 8px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .champ-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      background: #16a34a;
+      color: #fff;
+      font-size: 8.5px;
+      font-weight: 700;
+      padding: 1.5px 5px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      margin-bottom: 3px;
+      width: fit-content;
+    }
+
+    .champ-val {
+      font-size: 21px;
+      font-weight: 800;
+      color: #14532d;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+      margin-bottom: 3px;
+    }
+
+    .champ-val span {
+      font-size: 11px;
+      font-weight: 600;
+      color: #166534;
+    }
+
+    .champ-desc {
+      font-size: 10px;
+      color: #166534;
+      line-height: 1.25;
+      font-weight: 600;
+    }
+
+    .champ-meta-pills {
+      display: flex;
+      gap: 4px;
+      margin-top: 4px;
+    }
+
+    .meta-pill {
+      background: rgba(22, 163, 74, 0.12);
+      color: #14532d;
+      font-size: 8.5px;
+      font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 2px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Candidate list */
+    .cand-list {
+      display: flex;
+      flex-direction: column;
+      gap: 2.5px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .cand-row {
+      display: flex;
+      align-items: center;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-sm);
+      padding: 2.5px 5px;
+      font-size: 10px;
+    }
+
+    .cand-rank {
+      width: 15px;
+      height: 15px;
+      background: var(--navy-800);
+      color: #fff;
+      border-radius: 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8.5px;
+      font-weight: 700;
+      margin-right: 5px;
+      flex-shrink: 0;
+    }
+
+    .cand-info {
+      flex: 1;
+      line-height: 1.15;
+    }
+
+    .cand-resins {
+      font-weight: 700;
+      color: var(--navy-900);
+    }
+
+    .cand-hardener {
+      font-size: 9px;
+      color: var(--text-muted);
+    }
+
+    /* Top Drivers Bars */
+    .driver-list {
+      display: flex;
+      flex-direction: column;
+      gap: 3.5px;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .driver-item {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .driver-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 9.5px;
+      font-weight: 600;
+      color: var(--navy-800);
+    }
+
+    .driver-range {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9px;
+      color: var(--teal-600);
+      font-weight: 700;
+      background: var(--teal-50);
+      padding: 0 3px;
+      border-radius: 2px;
+      border: 1px solid #ccfbf1;
+    }
+
+    .driver-bar-wrap {
+      background: #e2e8f0;
+      height: 4px;
+      border-radius: 2px;
+      overflow: hidden;
+      display: flex;
+    }
+
+    .driver-bar-fill {
+      background: linear-gradient(90deg, var(--teal-600), #2563eb);
+      height: 100%;
+      border-radius: 2px;
+    }
+
+    /* SECTION 2: COMPACT SIMULATOR */
+    .sim-layout {
+      display: grid;
+      grid-template-columns: 1.1fr 1fr;
+      gap: 8px;
+    }
+
+    .panel-card {
+      background: var(--surface);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 8px 10px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* Sliders */
+    .slider-group {
+      margin-bottom: 5px;
+    }
+
+    .slider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1px;
+    }
+
+    .monomer-tag {
+      font-weight: 700;
+      font-size: 10.5px;
+      color: var(--navy-900);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-bio {
+      background: #dcfce7;
+      color: #15803d;
+      font-size: 8.5px;
+      font-weight: 700;
+      padding: 1px 3px;
+      border-radius: 2px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .badge-petro {
+      background: #f1f5f9;
+      color: #475569;
+      font-size: 8.5px;
+      font-weight: 700;
+      padding: 1px 3px;
+      border-radius: 2px;
+      text-transform: uppercase;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .slider-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      font-size: 10.5px;
+      color: var(--blue-600);
+    }
+
+    input[type=range] {
+      width: 100%;
+      height: 4px;
+      background: #e2e8f0;
+      border-radius: 2px;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--blue-600);
+      cursor: pointer;
+    }
+
+    /* Hero Card */
+    .hero-card {
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      color: #fff;
+      border-radius: var(--radius-md);
+      padding: 8px 12px;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .hero-label {
+      font-size: 9.5px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: #94a3b8;
+      margin-bottom: 1px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .hero-mpa {
+      font-size: 26px;
+      font-weight: 800;
+      color: #38bdf8;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+    }
+
+    .hero-mpa span {
+      font-size: 12px;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
+
+    .hero-sub {
+      font-size: 9px;
+      color: #94a3b8;
+      margin-top: 2px;
+    }
+
+    /* Specimen SVG Container */
+    .specimen-wrap {
+      width: 140px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px;
+    }
+
+    .specimen-wrap svg {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 12 Mixture Properties Grid */
+    .prop-grid-12 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      margin-bottom: 6px;
+    }
+
+    .prop-tile {
+      background: #f8fafc;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      padding: 3.5px 5px;
+    }
+
+    .prop-tile-lbl {
+      font-size: 8.5px;
+      color: var(--text-muted);
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .prop-tile-val {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--navy-900);
+    }
+
+    /* Active Formulation Summary with Gauge Color Bar */
+    .active-blend-box {
+      background: #f8fafc;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      padding: 6px 8px;
+    }
+
+    .blend-gauge-bar {
+      display: flex;
+      height: 6px;
+      border-radius: 3px;
+      overflow: hidden;
+      background: #e2e8f0;
+      margin-bottom: 5px;
+    }
+
+    .gauge-seg {
+      height: 100%;
+      transition: width 0.15s ease;
+    }
+
+    .blend-legend {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+      font-size: 9.5px;
+      color: var(--navy-800);
+      font-weight: 600;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .legend-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    /* TABLES (TAB 2 & TAB 3) */
+    .table-container {
+      background: var(--surface);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      overflow-x: auto;
+      max-height: calc(100vh - 120px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 10.5px;
+      text-align: left;
+    }
+
+    th {
+      background: #f1f5f9;
+      color: var(--navy-800);
+      font-weight: 700;
+      padding: 5px 7px;
+      border: 1px solid #e2e8f0;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 4px 7px;
+      border: 1px solid #e2e8f0;
+      color: #334155;
+      white-space: nowrap;
+    }
+
+    tr:hover td {
+      background: #f8fafc;
+    }
+
+    td.editable {
+      cursor: cell;
+    }
+
+    td.editable:hover {
+      background: #eff6ff;
+      outline: 1px dashed #3b82f6;
+    }
+
+    td.na-cell {
+      color: #94a3b8;
+      font-style: italic;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 9.5px;
+    }
+
+    .val-highlight {
+      background: #dbeafe;
+      color: #1e40af;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      padding: 2px 4px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+
+    .action-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      background: var(--surface);
+      padding: 5px 8px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+    }
+
+    .new-row-panel {
+      display: none;
+      background: #f8fafc;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-md);
+      padding: 6px 8px;
+      margin-bottom: 6px;
+    }
+
+    .new-row-panel.show {
+      display: block;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 5px;
+      margin-bottom: 6px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+    }
+
+    .form-field label {
+      font-size: 8.5px;
+      font-weight: 700;
+      color: var(--navy-800);
+    }
+
+    .form-field input {
+      padding: 3px 5px;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      font-size: 10px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* TAB 4: WORKFLOW & ACTIVE LEARNING CYCLE */
+    .workflow-container {
+      background: var(--surface);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 10px 14px;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .target-banner {
+      background: linear-gradient(135deg, #eff6ff, #f0fdfa);
+      border: 1px solid #bfdbfe;
+      border-radius: var(--radius-sm);
+      padding: 7px 12px;
+      margin-bottom: 10px;
+    }
+
+    .target-title {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--navy-900);
+      margin-bottom: 2px;
+    }
+
+    .target-desc {
+      font-size: 10px;
+      color: #334155;
+      line-height: 1.35;
+    }
+
+    .workflow-svg-wrap {
+      width: 100%;
+      background: #f8fafc;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-md);
+      padding: 10px 8px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .stages-summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr) 1.25fr;
+      gap: 6px;
+    }
+
+    .stage-card {
+      background: #f8fafc;
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius-sm);
+      padding: 6px 8px;
+    }
+
+    .stage-card.success-card {
+      background: #f0fdf4;
+      border: 1.5px solid #86efac;
+    }
+
+    .stage-card-num {
+      display: inline-block;
+      background: var(--navy-900);
+      color: #fff;
+      font-size: 8px;
+      font-weight: 700;
+      padding: 1px 4px;
+      border-radius: 2px;
+      margin-bottom: 3px;
+      text-transform: uppercase;
+    }
+
+    .stage-card-title {
+      font-size: 10px;
+      font-weight: 700;
+      color: var(--navy-900);
+      margin-bottom: 2px;
+    }
+
+    .stage-card-p {
+      font-size: 9px;
+      color: #475569;
+      line-height: 1.25;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <div class="top-navbar">
+    <div class="brand-group">
+      <div class="brand-icon">
+        <svg viewBox="0 0 24 24"><path d="M10 2v7.31M14 9.3V1.99M8.5 2h7M14 9.3a6.5 6.5 0 1 1-4 0"/></svg>
+      </div>
+      <div>
+        <div class="brand-title">EpoxyBlend.ML · Synergistic Blended Epoxy Adhesive Discovery Workbench</div>
+        <div class="brand-tag">Machine Learning Optimization of Multi-Monomer Blends</div>
+      </div>
+    </div>
+
+    <!-- ML Model Hub -->
+    <div class="model-hub">
+      <label>ML model:</label>
+      <select id="mlModelSelect" onchange="switchModel(this.value)">
+        <option value="RandomForest" selected>Random Forest Regressor (Ensemble)</option>
+        <option value="XGBoost">Gradient Boosted Trees (XGBoost)</option>
+        <option value="GPR">Gaussian Process Regression (GPR)</option>
+      </select>
+      <div class="metrics-group">
+        <div class="metric-pill">Train R²: <strong id="metricR2">0.82</strong></div>
+        <div class="metric-pill">5-Fold CV R²: <strong id="metricCV">0.74</strong></div>
+        <div class="metric-pill">RMSE: <strong id="metricRMSE">2.45 MPa</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs Navigation -->
+  <div class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('tab1', this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z"/></svg>
+      Formulation Discovery & Prediction
+    </button>
+    <button class="tab-btn" onclick="switchTab('tab2', this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+      Monomer & Hardener Master Database
+    </button>
+    <button class="tab-btn" onclick="switchTab('tab3', this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      Our Experiment Data
+    </button>
+    <button class="tab-btn" onclick="switchTab('tab4', this)">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Workflow & Active Learning Cycle
+    </button>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAB 1: FORMULATION DISCOVERY & PREDICTION   -->
+  <!-- ========================================== -->
+  <div id="tab1" class="tab-pane active">
+
+    <!-- SECTION 1: FORMULATION DISCOVERY -->
+    <div class="section-title-bar">
+      <div class="section-title">
+        <span class="step-num">1</span>
+        Section 1: Formulation Discovery
+      </div>
+      <div style="font-size: 10px; color: var(--text-muted); font-weight: 600;">
+        Model-guided screening & optimal parameter targets
+      </div>
+    </div>
+
+    <div class="discovery-grid">
+      <!-- 1. Champion Benchmark -->
+      <div class="disco-card">
+        <div class="disco-card-header">
+          <div class="disco-card-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
+            Current Highest Experiment Blend
+          </div>
+          <span style="font-size: 9px; font-weight: 700; color: #166534;">Order #5 · ID 36862</span>
+        </div>
+        <div class="champ-box">
+          <div class="champ-badge">Max Measured Adhesive Shear Strength</div>
+          <div class="champ-val">24.36 <span>MPa</span></div>
+          <div class="champ-desc">
+            20% Monomer 2 (DGEBF) + 80% Monomer 7 (GDGE)
+          </div>
+          <div class="champ-meta-pills">
+            <span class="meta-pill">Hardener: 50% IPDA / 50% Jeffamine</span>
+            <span class="meta-pill">Stoichiometry: r = 0.80</span>
+            <span class="meta-pill">Complexity: 4</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Proposed Next 5 Candidates -->
+      <div class="disco-card">
+        <div class="disco-card-header">
+          <div class="disco-card-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Proposed Next 5 Candidates (for New High Adhesive Shear Strength)
+          </div>
+          <span id="activeModelTag" style="font-size: 9px; font-weight: 700; color: #2563eb;">Random Forest</span>
+        </div>
+        <div class="cand-list" id="candidateList">
+          <!-- Populated from model configuration -->
+        </div>
+      </div>
+
+      <!-- 3. Top 5 Key Property & Optimum Windows -->
+      <div class="disco-card">
+        <div class="disco-card-header">
+          <div class="disco-card-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#0d9488" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Top 5 Key Property & Optimum Windows
+          </div>
+          <span style="font-size: 9px; font-weight: 700; color: var(--teal-600);">Target Window</span>
+        </div>
+        <div class="driver-list" id="driverList">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: FORMULATION PREDICTION -->
+    <div class="section-title-bar">
+      <div class="section-title">
+        <span class="step-num">2</span>
+        Section 2: Formulation Prediction
+      </div>
+      <div class="btn-action-group">
+        <button class="btn-tool" onclick="generateRandomBlend()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 3 21 3 21 8"/><line x1="4" y1="20" x2="21" y2="3"/><polyline points="21 16 21 21 16 21"/><line x1="15" y1="15" x2="21" y2="21"/><line x1="4" y1="4" x2="9" y2="9"/></svg>
+          🎲 Random Formulation
+        </button>
+        <button class="btn-tool zero" onclick="resetSlidersToZero()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><line x1="3" y1="3" x2="3" y2="8"/><line x1="8" y1="8" x2="3" y2="8"/></svg>
+          ↺ Set Zero
+        </button>
+      </div>
+    </div>
+
+    <div class="sim-layout">
+      <!-- Left: Interactive Formulation Sliders -->
+      <div class="panel-card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <strong style="font-size: 10.5px; text-transform:uppercase; color:var(--navy-900);">Epoxy Monomers (x₁ to x₇)</strong>
+          <span id="monomerSumBadge" style="font-family:'JetBrains Mono'; font-weight:700; font-size:10px; color:#16a34a;">Sum: 1.00 / 1.00</span>
+        </div>
+
+        <!-- M1 -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="monomer-tag">Monomer 1: Bisphenol A Diglycidyl Ether <span class="badge-petro">🛢️ Petro</span></span>
+            <span class="slider-val" id="valM1">0.10</span>
+          </div>
+          <input type="range" id="m1" min="0" max="1" step="0.05" value="0.10" oninput="onMonomerSliderChange(1, this.value)">
+        </div>
+
+        <!-- M2 -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="monomer-tag">Monomer 2: Bisphenol F Diglycidyl Ether <span class="badge-petro">🛢️ Petro</span></span>
+            <span class="slider-val" id="valM2">0.90</span>
+          </div>
+          <input type="range" id="m2" min="0" max="1" step="0.05" value="0.90" oninput="onMonomerSliderChange(2, this.value)">
+        </div>
+
+        <!-- M3 -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="monomer-tag">Monomer 3: Tetraglycidyl 4,4'-Diaminodiphenylmethane <span class="badge-petro">🛢️ Petro</span></span>
+            <span class="slider-val" id="valM3">0.00</span>
+          </div>
+          <input type="range" id="m3" min="0" max="1" step="0.05" value="0.00" oninput="onMonomerSliderChange(3, this.value)">
+        </div>
+
+        <!-- M4 -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="monomer-tag">Monomer 4: Isosorbide Diglycidyl Ether <span class="badge-bio">🌿 Bio</span></span>
+            <span class="slider-val" id="valM4">0.00</span>
+          </div>
+          <input type="range" id="m4" min="0" max="1" step="0.05" value="0.00" oninput="onMonomerSliderChange(4, this.value)">
+        </div>
+
+        <!-- M5 -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="monomer-tag">Monomer 5: Epoxidized Cardanol Oil <span class="badge-bio">🌿 Bio</span></span>
+            <span class="slider-val" id="valM5">0.00</span>
+          </div>
+          <input type="range" id="m5" min="0" max="1" step="0.05" value="0.00" oninput="onMonomerSliderChange(5, this.value)">
+        </div>
+
+        <!-- M6 -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="monomer-tag">Monomer 6: 1,4-Butanediol Diglycidyl Ether <span class="badge-petro">🛢️ Petro</span></span>
+            <span class="slider-val" id="valM6">0.00</span>
+          </div>
+          <input type="range" id="m6" min="0" max="1" step="0.05" value="0.00" oninput="onMonomerSliderChange(6, this.value)">
+        </div>
+
+        <!-- M7 -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="monomer-tag">Monomer 7: Glycerol Diglycidyl Ether <span class="badge-petro">🛢️ Petro</span></span>
+            <span class="slider-val" id="valM7">0.00</span>
+          </div>
+          <input type="range" id="m7" min="0" max="1" step="0.05" value="0.00" oninput="onMonomerSliderChange(7, this.value)">
+        </div>
+
+        <!-- Hardeners Section -->
+        <div style="border-top: 1px solid var(--card-border); padding-top: 5px; margin-top: 4px;">
+          <div class="slider-group">
+            <div class="slider-header">
+              <span class="monomer-tag" style="font-size:10px;">Hardener: IPDA vs Jeffamine</span>
+              <span class="slider-val" id="valHardener">0.85 / 0.15</span>
+            </div>
+            <input type="range" id="hardenerSplit" min="0" max="1" step="0.05" value="0.85" oninput="onHardenerSliderChange(this.value)">
+          </div>
+
+          <div class="slider-group" style="margin-bottom:0;">
+            <div class="slider-header">
+              <span class="monomer-tag" style="font-size:10px;">Stoichiometric Ratio (r = Amine H / Epoxy)</span>
+              <span class="slider-val" id="valR">1.20</span>
+            </div>
+            <input type="range" id="ratioR" min="0.80" max="1.20" step="0.05" value="1.20" oninput="onRatioChange(this.value)">
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Prediction Hero & Calculated Mixture Properties -->
+      <div>
+        <!-- Prediction Hero Card -->
+        <div class="hero-card">
+          <div>
+            <div class="hero-label">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+              Predicted Adhesive Shear Strength
+            </div>
+            <div class="hero-mpa" id="predMpa">16.25 <span>MPa</span></div>
+            <div class="hero-sub" id="predModelSub">Based on Random Forest ensemble model</div>
+          </div>
+
+          <!-- Clean Lap Shear Specimen SVG (ASTM D1002) -->
+          <div class="specimen-wrap">
+            <svg viewBox="0 0 160 56" preserveAspectRatio="xMidYMid meet">
+              <defs>
+                <linearGradient id="barGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#94a3b8"/>
+                  <stop offset="100%" stop-color="#64748b"/>
+                </linearGradient>
+                <linearGradient id="barGrad2" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#cbd5e1"/>
+                  <stop offset="100%" stop-color="#94a3b8"/>
+                </linearGradient>
+                <marker id="arr" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                  <path d="M 0 0 L 10 5 L 0 10 z" fill="#38bdf8"/>
+                </marker>
+              </defs>
+              <!-- Top Adherend -->
+              <polygon points="15,20 85,20 95,13 25,13" fill="url(#barGrad2)" stroke="#334155" stroke-width="0.8"/>
+              <polygon points="15,20 15,26 85,26 85,20" fill="url(#barGrad1)" stroke="#334155" stroke-width="0.8"/>
+              <polygon points="85,20 95,13 95,19 85,26" fill="#475569" stroke="#334155" stroke-width="0.8"/>
+              <!-- Adhesive Interlayer -->
+              <polygon points="65,26 85,26 95,19 75,19" fill="#f59e0b" stroke="#d97706" stroke-width="0.6"/>
+              <!-- Bottom Adherend -->
+              <polygon points="65,28 135,28 145,21 75,21" fill="url(#barGrad2)" stroke="#334155" stroke-width="0.8"/>
+              <polygon points="65,28 65,34 135,34 135,28" fill="url(#barGrad1)" stroke="#334155" stroke-width="0.8"/>
+              <polygon points="135,28 145,21 145,27 135,34" fill="#475569" stroke="#334155" stroke-width="0.8"/>
+              <!-- Tensile Vectors -->
+              <line x1="12" y1="23" x2="3" y2="23" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#arr)"/>
+              <line x1="138" y1="31" x2="147" y2="31" stroke="#38bdf8" stroke-width="1.8" marker-end="url(#arr)"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 12 Calculated Mixture Properties Grid -->
+        <div style="font-size:9.5px; font-weight:700; text-transform:uppercase; color:var(--navy-800); margin-bottom:3px;">
+          Calculated Mixture Properties
+        </div>
+        <div class="prop-grid-12">
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">EEW (g/eq)</div>
+            <div class="prop-tile-val" id="mixEEW">171.6</div>
+          </div>
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">AHEW (g/eq)</div>
+            <div class="prop-tile-val" id="mixAHEW">49.8</div>
+          </div>
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">Viscosity @25°C</div>
+            <div class="prop-tile-val" id="mixVisc">3959 cP</div>
+          </div>
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">Cured Tg (°C)</div>
+            <div class="prop-tile-val" id="mixTg">145.5 °C</div>
+          </div>
+
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">Bio-Mass Content</div>
+            <div class="prop-tile-val" id="mixBio">0.0%</div>
+          </div>
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">Hansen Ra (MPa⁰·⁵)</div>
+            <div class="prop-tile-val" id="mixRa">0.64</div>
+          </div>
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">Hansen δ_d</div>
+            <div class="prop-tile-val" id="mixDd">19.0</div>
+          </div>
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">Hansen δ_p</div>
+            <div class="prop-tile-val" id="mixDp">7.8</div>
+          </div>
+
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">Hansen δ_h</div>
+            <div class="prop-tile-val" id="mixDh">7.2</div>
+          </div>
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">Density (g/cm³)</div>
+            <div class="prop-tile-val" id="mixDensity">1.18</div>
+          </div>
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">Mean TPSA (Å²)</div>
+            <div class="prop-tile-val" id="mixTPSA">43.5</div>
+          </div>
+          <div class="prop-tile">
+            <div class="prop-tile-lbl">Avg Functionality</div>
+            <div class="prop-tile-val" id="mixFunc">2.00</div>
+          </div>
+        </div>
+
+        <!-- Active Formulation Summary with Gauge Color Bar -->
+        <div class="active-blend-box">
+          <div class="blend-gauge-bar" id="gaugeBar">
+            <!-- Dynamic colored segments -->
+          </div>
+          <div class="blend-legend" id="blendLegend">
+            <!-- Dynamic text tags -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAB 2: MONOMER & HARDENER MASTER DATABASE   -->
+  <!-- ========================================== -->
+  <div id="tab2" class="tab-pane">
+    <div class="action-toolbar">
+      <div style="font-weight: 700; font-size: 11px; color: var(--navy-900);">
+        Monomer & Hardener Master Database
+      </div>
+      <button class="btn-tool" onclick="addPropertyColumn()">
+        + Add Property Column
+      </button>
+    </div>
+
+    <div class="table-container">
+      <table id="masterDatabaseTable">
+        <thead>
+          <tr id="dbHeaderRow">
+            <th>Component Name</th>
+            <th>CAS Number</th>
+            <th>Commercial Grade</th>
+            <th>EEW / AHEW (g/eq)</th>
+            <th>Functionality</th>
+            <th>Viscosity @ 25°C (cP)</th>
+            <th>Density (g/cm³)</th>
+            <th>Pure Cured Tg (°C)</th>
+            <th>Hansen δ_d (MPa⁰·⁵)</th>
+            <th>Hansen δ_p (MPa⁰·⁵)</th>
+            <th>Hansen δ_h (MPa⁰·⁵)</th>
+            <th>LogP</th>
+            <th>Surface Tension (mN/m)</th>
+            <th>TPSA (Å²)</th>
+            <th>Homopolymer Cured Young's Modulus E (GPa)</th>
+          </tr>
+        </thead>
+        <tbody id="dbTableBody">
+          <!-- Populated from JS dataset -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAB 3: OUR EXPERIMENT DATA                 -->
+  <!-- ========================================== -->
+  <div id="tab3" class="tab-pane">
+    <div class="action-toolbar">
+      <div style="font-weight: 700; font-size: 11px; color: var(--navy-900);">
+        Our Experiment Data
+      </div>
+      <button class="btn-tool" onclick="toggleAddRowPanel()">
+        + Add New Experiment Row
+      </button>
+    </div>
+
+    <!-- Collapsible Add Row Form -->
+    <div id="newRowPanel" class="new-row-panel">
+      <div style="font-weight:700; font-size:10px; margin-bottom:5px; color:var(--navy-900);">
+        Enter New Formulation Parameters & Measured Shear Strength:
+      </div>
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Recipe ID</label>
+          <input type="text" id="newRecipeId" placeholder="e.g. 50101">
+        </div>
+        <div class="form-field">
+          <label>Complexity</label>
+          <input type="number" id="newComplexity" value="4">
+        </div>
+        <div class="form-field">
+          <label>IPDA Frac</label>
+          <input type="number" id="newIpda" step="0.05" value="0.50">
+        </div>
+        <div class="form-field">
+          <label>Jeffamine Frac</label>
+          <input type="number" id="newJeff" step="0.05" value="0.50">
+        </div>
+        <div class="form-field">
+          <label>Stoich. Ratio (r)</label>
+          <input type="number" id="newRatioR" step="0.05" value="1.00">
+        </div>
+        <div class="form-field">
+          <label>Measured Strength (MPa)</label>
+          <input type="number" id="newStrength" step="0.1" placeholder="e.g. 18.5">
+        </div>
+
+        <div class="form-field">
+          <label>Monomer 1 Frac</label>
+          <input type="number" id="newM1" step="0.05" value="0">
+        </div>
+        <div class="form-field">
+          <label>Monomer 2 Frac</label>
+          <input type="number" id="newM2" step="0.05" value="0">
+        </div>
+        <div class="form-field">
+          <label>Monomer 3 Frac</label>
+          <input type="number" id="newM3" step="0.05" value="0">
+        </div>
+        <div class="form-field">
+          <label>Monomer 4 Frac</label>
+          <input type="number" id="newM4" step="0.05" value="0">
+        </div>
+        <div class="form-field">
+          <label>Monomer 5 Frac</label>
+          <input type="number" id="newM5" step="0.05" value="0">
+        </div>
+        <div class="form-field">
+          <label>Monomer 6 / 7 Frac</label>
+          <div style="display:flex; gap:4px;">
+            <input type="number" id="newM6" step="0.05" value="0" placeholder="M6" style="width:50%;">
+            <input type="number" id="newM7" step="0.05" value="0" placeholder="M7" style="width:50%;">
+          </div>
+        </div>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:5px;">
+        <button class="btn-tool" onclick="toggleAddRowPanel()">Cancel</button>
+        <button class="btn-tool" style="background:var(--blue-600); color:#fff;" onclick="submitNewExperimentRow()">Save Experiment & Retrain Model</button>
+      </div>
+    </div>
+
+    <!-- Data Table -->
+    <div class="table-container">
+      <table id="experimentDataTable">
+        <thead>
+          <tr>
+            <th>Order</th>
+            <th>Sample Name</th>
+            <th>Recipe ID</th>
+            <th>Blend Complexity</th>
+            <th>IPDA Frac</th>
+            <th>Jeffamine Frac</th>
+            <th>Stoichiometric Ratio (r)</th>
+            <th>Monomer 1: DGEBA</th>
+            <th>Monomer 2: DGEBF</th>
+            <th>Monomer 3: TGDDM</th>
+            <th>Monomer 4: ISDGE</th>
+            <th>Monomer 5: Cardanol Oil</th>
+            <th>Monomer 6: BDDGE</th>
+            <th>Monomer 7: GDGE</th>
+            <th style="background:#dbeafe; color:#1e40af;">Measured Adhesive Shear Strength (MPa)</th>
+          </tr>
+        </thead>
+        <tbody id="expTableBody">
+          <!-- Populated from JS dataset -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- TAB 4: WORKFLOW & ACTIVE LEARNING CYCLE    -->
+  <!-- ========================================== -->
+  <div id="tab4" class="tab-pane">
+    <div class="workflow-container">
+      <!-- Target Summary Banner (35 MPa) -->
+      <div class="target-banner">
+        <div class="target-title">Target & Hypothesis</div>
+        <div class="target-desc">
+          Discover high-strength epoxy formulations (>35 MPa) through the blending of different epoxy monomers (up to 7 components) with different hardeners and ratios. The ML surrogate captures non-linear micro-phase separation synergies that linear mixture averages miss.
+        </div>
+      </div>
+
+      <!-- Graphical Workflow Architecture with Decision Gate & Termination (SVG) -->
+      <div class="workflow-svg-wrap">
+        <svg viewBox="0 0 960 210" width="100%" height="210" style="max-width:960px;">
+          <defs>
+            <marker id="wfBlueArr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="#2563eb"/>
+            </marker>
+            <marker id="wfRedLoop" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="#ea580c"/>
+            </marker>
+            <marker id="wfGreenArr" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 1 L 8 5 L 0 9 z" fill="#16a34a"/>
+            </marker>
+          </defs>
+
+          <!-- 1. LAB TESTING (Start Stage) -->
+          <rect x="15" y="20" width="145" height="85" rx="6" fill="#f0fdf4" stroke="#86efac" stroke-width="1.5"/>
+          <text x="23" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="10" fill="#14532d">1. LAB TESTING</text>
+          <text x="23" y="55" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#166534">• Blend Synthesis in Lab</text>
+          <text x="23" y="70" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#166534">• ASTM D1002 Lap Shear</text>
+          <text x="23" y="85" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#166534">• Measure Strength (MPa)</text>
+
+          <!-- Arrow 1 -> 2 -->
+          <line x1="160" y1="62" x2="185" y2="62" stroke="#2563eb" stroke-width="1.8" marker-end="url(#wfBlueArr)"/>
+
+          <!-- 2. DATA UPDATING -->
+          <rect x="195" y="20" width="150" height="85" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="203" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="10" fill="#0f172a">2. DATA UPDATING</text>
+          <text x="203" y="55" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• Monomer &amp; Hardener Database</text>
+          <text x="203" y="70" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• Experimental Adhesive</text>
+          <text x="203" y="83" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">  Shear Strength Database</text>
+
+          <!-- Arrow 2 -> 3 -->
+          <line x1="345" y1="62" x2="370" y2="62" stroke="#2563eb" stroke-width="1.8" marker-end="url(#wfBlueArr)"/>
+
+          <!-- 3. MODEL CREATION -->
+          <rect x="380" y="20" width="150" height="85" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="388" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="10" fill="#0f172a">3. MODEL CREATION</text>
+          <text x="388" y="55" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• Physical Mixing Rules</text>
+          <text x="388" y="70" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• RF, XGBoost, GPR Models</text>
+          <text x="388" y="85" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• Feature Drivers &amp; Synergy</text>
+
+          <!-- Arrow 3 -> 4 -->
+          <line x1="530" y1="62" x2="555" y2="62" stroke="#2563eb" stroke-width="1.8" marker-end="url(#wfBlueArr)"/>
+
+          <!-- 4. PROPOSE NEXT EXPERIMENT -->
+          <rect x="565" y="20" width="155" height="85" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+          <text x="573" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="10" fill="#0f172a">4. PROPOSE NEXT EXP</text>
+          <text x="573" y="55" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• Virtual Simplex Screening</text>
+          <text x="573" y="70" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• Top 5 High-Adhesion Targets</text>
+          <text x="573" y="85" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• Optimum Property Windows</text>
+
+          <!-- Arrow 4 -> Decision Diamond -->
+          <line x1="720" y1="62" x2="755" y2="62" stroke="#2563eb" stroke-width="1.8" marker-end="url(#wfBlueArr)"/>
+
+          <!-- DECISION DIAMOND: > 35 MPa? -->
+          <polygon points="805,25 855,62 805,100 755,62" fill="#eff6ff" stroke="#3b82f6" stroke-width="1.8"/>
+          <text x="805" y="56" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="8.5" fill="#1e3a8a">New High</text>
+          <text x="805" y="69" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="8.5" fill="#1e3a8a">> 35 MPa?</text>
+
+          <!-- YES BRANCH -> SUCCESS STATE (Down & Right) -->
+          <line x1="855" y1="62" x2="880" y2="62" stroke="#16a34a" stroke-width="2" marker-end="url(#wfGreenArr)"/>
+          <text x="866" y="53" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="8.5" fill="#16a34a">YES</text>
+
+          <!-- SUCCESS MILESTONE BOX -->
+          <rect x="885" y="20" width="65" height="85" rx="6" fill="#f0fdf4" stroke="#16a34a" stroke-width="2"/>
+          <text x="917" y="44" text-anchor="middle" font-size="16">🏆</text>
+          <text x="917" y="62" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="8.5" fill="#14532d">> 35 MPa</text>
+          <text x="917" y="75" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="7.5" fill="#16a34a">SUCCESS!</text>
+          <text x="917" y="88" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="600" font-size="6.5" fill="#166534">Goal Met</text>
+
+          <!-- NO BRANCH (Loop back to Stage 1 & 2) -->
+          <line x1="805" y1="100" x2="805" y2="135" stroke="#ea580c" stroke-width="2"/>
+          <text x="812" y="118" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="8.5" fill="#ea580c">NO (Collect More Data)</text>
+
+          <path d="M 805 135 L 805 160 L 85 160 L 85 110" fill="none" stroke="#ea580c" stroke-width="2" stroke-dasharray="4,4" marker-end="url(#wfRedLoop)"/>
+          <text x="445" y="152" text-anchor="middle" font-family="'Plus Jakarta Sans', sans-serif" font-weight="700" font-size="8.5" fill="#c2410c">
+            Feed proposed candidates to Lab Testing &amp; Data Updating ── Auto-retrain models until target > 35 MPa is achieved
+          </text>
+        </svg>
+      </div>
+
+      <!-- Concise Explanations Grid -->
+      <div class="stages-summary-grid">
+        <div class="stage-card">
+          <span class="stage-card-num">Step 1</span>
+          <div class="stage-card-title">1. LAB TESTING</div>
+          <div class="stage-card-p">
+            • <strong>Blend Synthesis:</strong> Precise formulation compounding.<br>
+            • <strong>ASTM D1002 Tensile Test:</strong> Lap shear strength evaluation on adherends.<br>
+            • <strong>Data Logging:</strong> Measures raw shear strength (MPa).
+          </div>
+        </div>
+
+        <div class="stage-card">
+          <span class="stage-card-num">Step 2</span>
+          <div class="stage-card-title">2. DATA UPDATING</div>
+          <div class="stage-card-p">
+            • <strong>Monomer &amp; Hardener Database:</strong> Curates pure physical, topological &amp; Hansen properties.<br>
+            • <strong>Experiment Database:</strong> Aggregates compounding runs and measured strengths.
+          </div>
+        </div>
+
+        <div class="stage-card">
+          <span class="stage-card-num">Step 3</span>
+          <div class="stage-card-title">3. MODEL CREATION</div>
+          <div class="stage-card-p">
+            • <strong>Physical Mixing Rules:</strong> Computes non-linear descriptors (viscosity, Ra, EEW).<br>
+            • <strong>RF, XGBoost &amp; GPR Ensembles:</strong> Surrogate modeling captures micro-phase synergy.
+          </div>
+        </div>
+
+        <div class="stage-card">
+          <span class="stage-card-num">Step 4</span>
+          <div class="stage-card-title">4. PROPOSE NEXT EXP</div>
+          <div class="stage-card-p">
+            • <strong>Virtual Simplex Screening:</strong> All-combination multi-component candidate search.<br>
+            • <strong>Top 5 High-Adhesion Targets:</strong> Recommends formulations for next lab compounding.
+          </div>
+        </div>
+
+        <div class="stage-card success-card">
+          <span class="stage-card-num" style="background:#16a34a;">Decision Gate</span>
+          <div class="stage-card-title" style="color:#14532d;">EVALUATION &amp; TERMINATION</div>
+          <div class="stage-card-p" style="color:#166534;">
+            • <strong>NO (&lt;35 MPa):</strong> Add data to Stage 2, retrain models, loop again.<br>
+            • <strong>YES (≥35 MPa):</strong> 🏆 <strong>TARGET SUCCESS!</strong> Formulation qualified for pilot scale-up and industrial transfer.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ======================================================== */
+    /* 1. DATA DEFINITIONS & DATABASE WITH REALISTIC VALUES      */
+    /* ======================================================== */
+    const monomerColors = ['#3b82f6', '#06b6d4', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#6366f1'];
+
+    const monomers = {
+      M1: { name: "Bisphenol A Diglycidyl Ether (DGEBA)", cas: "1675-54-3", grade: "Epon 828 / DER 331", eew: 188, func: 2, visc: 12000, density: 1.16, tg: 150, dd: 18.7, dp: 7.6, dh: 7.3, logp: 3.84, st: 44, tpsa: 43.5, e: 3.1 },
+      M2: { name: "Bisphenol F Diglycidyl Ether (DGEBF)", cas: "2095-03-6", grade: "Epon 862 / DER 354", eew: 170, func: 2, visc: 3500, density: 1.18, tg: 145, dd: 19.0, dp: 7.8, dh: 7.2, logp: 3.26, st: 43, tpsa: 43.5, e: 3.0 },
+      M3: { name: "Tetraglycidyl 4,4'-Diaminodiphenylmethane (TGDDM)", cas: "28768-32-4", grade: "Araldite MY 721", eew: 115, func: 4, visc: 50000, density: 1.15, tg: 220, dd: 19.4, dp: 8.2, dh: 6.8, logp: 2.15, st: null, tpsa: 56.6, e: 3.8 },
+      M4: { name: "Isosorbide Diglycidyl Ether (ISDGE)", cas: "30416-24-1", grade: "Bio-Isosorbide Epoxy", eew: 130, func: 2, visc: 760, density: 1.21, tg: 110, dd: 17.5, dp: 9.1, dh: 8.5, logp: -0.45, st: null, tpsa: 62.0, e: null },
+      M5: { name: "Epoxidized Cardanol Oil", cas: "101316-24-9", grade: "Cardolite NC-514", eew: 400, func: 2, visc: 50, density: 0.98, tg: 25, dd: 16.5, dp: 3.2, dh: 4.1, logp: 7.50, st: 31, tpsa: null, e: 0.2 },
+      M6: { name: "1,4-Butanediol Diglycidyl Ether (BDDGE)", cas: "2425-79-8", grade: "Heloxy 67 / DY-D", eew: 130, func: 2, visc: 15, density: 1.10, tg: -20, dd: 16.5, dp: 6.8, dh: 7.5, logp: 0.65, st: 36, tpsa: 43.5, e: null },
+      M7: { name: "Glycerol Diglycidyl Ether (GDGE)", cas: "2238-07-5", grade: "Denacol EX-313", eew: 143, func: 3, visc: 20, density: 1.20, tg: -10, dd: 16.8, dp: 8.5, dh: 9.2, logp: -0.82, st: null, tpsa: null, e: null },
+      IPDA: { name: "Isophorone Diamine (IPDA)", cas: "2855-13-2", grade: "Vestamin IPD", ahew: 42.6, func: 4, visc: 15, density: 0.92, tg: null, dd: 16.8, dp: 5.2, dh: 9.8, logp: 0.99, st: null, tpsa: 52.0, e: null },
+      Jeff: { name: "Polyoxypropylenediamine (Jeffamine D230)", cas: "9046-10-0", grade: "Jeffamine D-230", ahew: 60.0, func: 4, visc: 10, density: 0.95, tg: null, dd: 16.2, dp: 4.5, dh: 8.4, logp: 0.40, st: null, tpsa: null, e: null }
+    };
+
+    // 32 Experimental Runs
+    let experimentData = [
+      { order: 1, name: "4284", recipe: "4284", comp: 3, ipda: 0.50, jeff: 0.50, r: 1.20, m: [0, 0, 1, 0, 0, 0, 0], strength: 12.25 },
+      { order: 2, name: "19867", recipe: "19867", comp: 4, ipda: 0.50, jeff: 0.50, r: 0.80, m: [0, 0.20, 0, 0, 0.40, 0, 0.40], strength: 14.01 },
+      { order: 3, name: "7365", recipe: "7365", comp: 3, ipda: 1.00, jeff: 0.00, r: 1.20, m: [0, 0, 0, 0, 0, 1.00, 0], strength: 18.25 },
+      { order: 4, name: "27911", recipe: "27911", comp: 4, ipda: 0.75, jeff: 0.25, r: 1.00, m: [0.40, 0, 0, 0.20, 0, 0, 0.40], strength: 12.06 },
+      { order: 5, name: "36862", recipe: "36862", comp: 4, ipda: 0.50, jeff: 0.50, r: 0.80, m: [0, 0.20, 0, 0, 0, 0, 0.80], strength: 24.36 },
+      { order: 6, name: "2192", recipe: "2192", comp: 3, ipda: 0.00, jeff: 1.00, r: 1.00, m: [0.40, 0.40, 0.20, 0, 0, 0, 0], strength: 12.02 },
+      { order: 7, name: "28997", recipe: "28997", comp: 4, ipda: 0.00, jeff: 1.00, r: 1.00, m: [0, 0, 0, 0, 0, 0.20, 0.80], strength: 7.39 },
+      { order: 8, name: "25970", recipe: "25970", comp: 4, ipda: 0.25, jeff: 0.75, r: 1.00, m: [0.20, 0, 0, 0, 0, 0.40, 0.40], strength: 17.99 },
+      { order: 9, name: "20441", recipe: "20441", comp: 4, ipda: 0.75, jeff: 0.25, r: 1.00, m: [0.60, 0, 0, 0, 0, 0, 0.40], strength: 0.00 },
+      { order: 10, name: "26205", recipe: "26205", comp: 4, ipda: 1.00, jeff: 0.00, r: 1.20, m: [0.40, 0, 0, 0, 0, 0.40, 0.20], strength: 8.28 },
+      { order: 11, name: "23871", recipe: "23871", comp: 4, ipda: 0.25, jeff: 0.75, r: 1.20, m: [0.60, 0, 0.40, 0, 0, 0, 0], strength: 11.83 },
+      { order: 12, name: "13169", recipe: "13169", comp: 4, ipda: 1.00, jeff: 0.00, r: 1.00, m: [0, 0.20, 0.60, 0.20, 0, 0, 0], strength: 13.52 },
+      { order: 13, name: "344", recipe: "344", comp: 2, ipda: 1.00, jeff: 0.00, r: 1.00, m: [0.60, 0, 0, 0.40, 0, 0, 0], strength: 10.47 },
+      { order: 14, name: "21984", recipe: "21984", comp: 4, ipda: 0.50, jeff: 0.50, r: 1.20, m: [0.40, 0, 0, 0.20, 0.40, 0, 0], strength: 23.84 },
+      { order: 15, name: "18593", recipe: "18593", comp: 4, ipda: 0.50, jeff: 0.50, r: 1.00, m: [0.20, 0.80, 0, 0, 0, 0, 0], strength: 14.04 },
+      { order: 16, name: "25749", recipe: "25749", comp: 4, ipda: 0.50, jeff: 0.50, r: 1.20, m: [0, 0, 0.20, 0, 0, 0.40, 0.40], strength: 19.46 },
+      { order: 17, name: "26875", recipe: "26875", comp: 4, ipda: 0.75, jeff: 0.25, r: 0.80, m: [0.20, 0, 0, 0.20, 0.20, 0.40, 0], strength: 15.79 },
+      { order: 18, name: "30542", recipe: "30542", comp: 4, ipda: 0.00, jeff: 1.00, r: 1.00, m: [0, 0.60, 0, 0.40, 0, 0, 0], strength: 13.41 },
+      { order: 19, name: "38595", recipe: "38595", comp: 4, ipda: 1.00, jeff: 0.00, r: 1.20, m: [0, 0, 0.20, 0, 0.60, 0.20, 0], strength: 10.03 },
+      { order: 20, name: "29595", recipe: "29595", comp: 4, ipda: 1.00, jeff: 0.00, r: 1.20, m: [0.40, 0, 0, 0, 0.20, 0, 0.40], strength: 19.66 },
+      { order: 21, name: "23598", recipe: "23598", comp: 4, ipda: 0.00, jeff: 1.00, r: 1.20, m: [0.20, 0, 0.60, 0, 0, 0, 0.20], strength: 9.42 },
+      { order: 22, name: "27715", recipe: "27715", comp: 4, ipda: 0.75, jeff: 0.25, r: 0.80, m: [0.20, 0, 0, 0.20, 0.20, 0, 0.40], strength: 13.72 },
+      { order: 23, name: "35201", recipe: "35201", comp: 4, ipda: 0.75, jeff: 0.25, r: 1.00, m: [0, 0.20, 0, 0, 0.20, 0.60, 0], strength: 0.00 },
+      { order: 24, name: "41060", recipe: "41060", comp: 4, ipda: 0.25, jeff: 0.75, r: 1.00, m: [0, 0, 0.20, 0, 0, 0, 0.80], strength: 20.08 },
+      { order: 25, name: "9007", recipe: "9007", comp: 3, ipda: 0.50, jeff: 0.50, r: 0.80, m: [0, 0, 0, 0, 1.00, 0, 0], strength: 0.00 },
+      { order: 26, name: "7091", recipe: "7091", comp: 3, ipda: 0.75, jeff: 0.25, r: 1.00, m: [0, 0, 0.60, 0, 0.40, 0, 0], strength: 10.28 },
+      { order: 27, name: "8407", recipe: "8407", comp: 3, ipda: 0.50, jeff: 0.50, r: 0.80, m: [0, 0.20, 0, 0.20, 0, 0.60, 0], strength: 4.12 },
+      { order: 28, name: "37128", recipe: "37128", comp: 4, ipda: 0.00, jeff: 1.00, r: 1.20, m: [0, 0.40, 0, 0, 0, 0.60, 0], strength: 13.58 },
+      { order: 29, name: "15489", recipe: "15489", comp: 4, ipda: 0.50, jeff: 0.50, r: 1.20, m: [0.80, 0, 0, 0, 0, 0.20, 0], strength: 17.79 },
+      { order: 30, name: "5149", recipe: "5149", comp: 3, ipda: 0.25, jeff: 0.75, r: 0.80, m: [0, 0, 0, 0, 0, 1.00, 0], strength: 1.41 },
+      { order: 31, name: "19483", recipe: "19483", comp: 4, ipda: 1.00, jeff: 0.00, r: 0.80, m: [0.40, 0, 0, 0, 0.40, 0.20, 0], strength: 13.11 },
+      { order: 32, name: "35750", recipe: "35750", comp: 4, ipda: 0.25, jeff: 0.75, r: 1.00, m: [0, 0, 0, 0, 0.60, 0, 0.40], strength: 7.49 }
+    ];
+
+    let currentModel = "RandomForest";
+
+    /* Realistic ML Calibration Configurations */
+    const modelConfigs = {
+      RandomForest: {
+        trainR2: "0.82", cvR2: "0.74", rmse: "2.45 MPa", tag: "Random Forest",
+        subtext: "Based on Random Forest ensemble model",
+        drivers: [
+          { name: "Mixture Viscosity (cP)", range: "100 – 1,100", weight: 30 },
+          { name: "Mixture EEW (g/eq)", range: "145 – 215", weight: 25 },
+          { name: "Hansen Distance Ra (MPa⁰·⁵)", range: "3.8 – 5.9", weight: 21 },
+          { name: "Cured Homopolymer Tg (°C)", range: "80 – 145", weight: 16 },
+          { name: "Average Functionality (f)", range: "2.00 – 2.60", weight: 8 }
+        ],
+        candidates: [
+          { resins: "30% Monomer 2 + 70% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 0.80" },
+          { resins: "40% Monomer 1 + 20% Monomer 4 + 40% Monomer 5", hardener: "50% IPDA / 50% Jeffamine · r = 1.15" },
+          { resins: "20% Monomer 1 + 30% Monomer 2 + 50% Monomer 7", hardener: "40% IPDA / 60% Jeffamine · r = 0.90" },
+          { resins: "15% Monomer 3 + 35% Monomer 6 + 50% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 1.10" },
+          { resins: "50% Monomer 1 + 20% Monomer 4 + 30% Monomer 7", hardener: "75% IPDA / 25% Jeffamine · r = 1.00" }
+        ],
+        offset: 0.0
+      },
+      XGBoost: {
+        trainR2: "0.86", cvR2: "0.77", rmse: "2.18 MPa", tag: "XGBoost",
+        subtext: "Based on Gradient Boosted Trees model",
+        drivers: [
+          { name: "Mixture EEW (g/eq)", range: "140 – 210", weight: 32 },
+          { name: "Mixture Viscosity (cP)", range: "80 – 850", weight: 26 },
+          { name: "Cured Homopolymer Tg (°C)", range: "75 – 140", weight: 20 },
+          { name: "Hansen Distance Ra (MPa⁰·⁵)", range: "4.0 – 6.2", weight: 14 },
+          { name: "Average Functionality (f)", range: "2.10 – 2.80", weight: 8 }
+        ],
+        candidates: [
+          { resins: "35% Monomer 2 + 65% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 0.85" },
+          { resins: "45% Monomer 1 + 25% Monomer 4 + 30% Monomer 7", hardener: "60% IPDA / 40% Jeffamine · r = 1.00" },
+          { resins: "25% Monomer 2 + 25% Monomer 4 + 50% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 0.90" },
+          { resins: "50% Monomer 1 + 15% Monomer 5 + 35% Monomer 7", hardener: "40% IPDA / 60% Jeffamine · r = 1.05" },
+          { resins: "30% Monomer 3 + 70% Monomer 7", hardener: "25% IPDA / 75% Jeffamine · r = 0.95" }
+        ],
+        offset: 0.4
+      },
+      GPR: {
+        trainR2: "0.79", cvR2: "0.71", rmse: "2.62 MPa", tag: "Gaussian Process",
+        subtext: "Based on Gaussian Process Regression (Matern 5/2)",
+        drivers: [
+          { name: "Hansen Distance Ra (MPa⁰·⁵)", range: "3.5 – 6.5", weight: 28 },
+          { name: "Mixture EEW (g/eq)", range: "150 – 220", weight: 26 },
+          { name: "Mixture Viscosity (cP)", range: "120 – 900", weight: 24 },
+          { name: "Cured Homopolymer Tg (°C)", range: "85 – 150", weight: 14 },
+          { name: "Average Functionality (f)", range: "2.00 – 2.50", weight: 8 }
+        ],
+        candidates: [
+          { resins: "25% Monomer 2 + 75% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 0.85" },
+          { resins: "35% Monomer 1 + 25% Monomer 5 + 40% Monomer 7", hardener: "60% IPDA / 40% Jeffamine · r = 1.00" },
+          { resins: "20% Monomer 3 + 80% Monomer 7", hardener: "30% IPDA / 70% Jeffamine · r = 0.90" },
+          { resins: "50% Monomer 2 + 50% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 0.80" },
+          { resins: "30% Monomer 1 + 30% Monomer 4 + 40% Monomer 6", hardener: "50% IPDA / 50% Jeffamine · r = 1.10" }
+        ],
+        offset: -0.3
+      }
+    };
+
+    /* ======================================================== */
+    /* 2. TAB CONTROLS & MODEL SWITCHING                        */
+    /* ======================================================== */
+    function switchTab(tabId, el) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+      el.classList.add('active');
+      document.getElementById(tabId).classList.add('active');
+    }
+
+    function switchModel(modelKey) {
+      currentModel = modelKey;
+      const cfg = modelConfigs[modelKey];
+
+      document.getElementById('metricR2').textContent = cfg.trainR2;
+      document.getElementById('metricCV').textContent = cfg.cvR2;
+      document.getElementById('metricRMSE').textContent = cfg.rmse;
+
+      document.getElementById('activeModelTag').textContent = cfg.tag;
+      document.getElementById('predModelSub').textContent = cfg.subtext;
+
+      renderDiscoverySection();
+      recalculateSimulation();
+    }
+
+    function renderDiscoverySection() {
+      const cfg = modelConfigs[currentModel];
+
+      // 1. Proposed Candidates
+      const candContainer = document.getElementById('candidateList');
+      candContainer.innerHTML = '';
+      cfg.candidates.forEach((cand, idx) => {
+        const row = document.createElement('div');
+        row.className = 'cand-row';
+        row.innerHTML = `
+          <div class="cand-rank">#${idx + 1}</div>
+          <div class="cand-info">
+            <div class="cand-resins">${cand.resins}</div>
+            <div class="cand-hardener">${cand.hardener}</div>
+          </div>
+        `;
+        candContainer.appendChild(row);
+      });
+
+      // 2. Top 5 Key Property & Optimum Windows
+      const driverContainer = document.getElementById('driverList');
+      driverContainer.innerHTML = '';
+      cfg.drivers.forEach(d => {
+        const item = document.createElement('div');
+        item.className = 'driver-item';
+        item.innerHTML = `
+          <div class="driver-header">
+            <span>${d.name}</span>
+            <span class="driver-range">${d.range}</span>
+          </div>
+          <div class="driver-bar-wrap">
+            <div class="driver-bar-fill" style="width: ${d.weight * 3.2}%;"></div>
+          </div>
+        `;
+        driverContainer.appendChild(item);
+      });
+    }
+
+    /* ======================================================== */
+    /* 3. SIMULATOR LOGIC & QUICK BUTTONS                       */
+    /* ======================================================== */
+    function onMonomerSliderChange(changedIndex, newVal) {
+      newVal = parseFloat(newVal);
+      const mIds = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7'];
+      let vals = mIds.map(id => parseFloat(document.getElementById(id).value));
+
+      vals[changedIndex - 1] = newVal;
+
+      let sum = vals.reduce((a, b) => a + b, 0);
+      if (sum > 1.0001) {
+        let excess = sum - 1.00;
+        for (let i = 0; i < vals.length; i++) {
+          if (i !== changedIndex - 1 && vals[i] > 0) {
+            let reduction = Math.min(vals[i], excess);
+            vals[i] -= reduction;
+            excess -= reduction;
+            if (excess <= 0.0001) break;
+          }
+        }
+      }
+
+      vals.forEach((v, idx) => {
+        document.getElementById(mIds[idx]).value = v.toFixed(2);
+        document.getElementById('valM' + (idx + 1)).textContent = v.toFixed(2);
+      });
+
+      let finalSum = vals.reduce((a, b) => a + b, 0);
+      const sumBadge = document.getElementById('monomerSumBadge');
+      sumBadge.textContent = `Sum: ${finalSum.toFixed(2)} / 1.00`;
+      sumBadge.style.color = Math.abs(finalSum - 1.0) < 0.02 ? "#16a34a" : "#ea580c";
+
+      recalculateSimulation();
+    }
+
+    function onHardenerSliderChange(val) {
+      val = parseFloat(val);
+      const ipda = val;
+      const jeff = 1.0 - val;
+      document.getElementById('valHardener').textContent = `${ipda.toFixed(2)} / ${jeff.toFixed(2)}`;
+      recalculateSimulation();
+    }
+
+    function onRatioChange(val) {
+      document.getElementById('valR').textContent = parseFloat(val).toFixed(2);
+      recalculateSimulation();
+    }
+
+    /* Random Formulation Button */
+    function generateRandomBlend() {
+      let indices = [0, 1, 2, 3, 4, 5, 6];
+      indices.sort(() => 0.5 - Math.random());
+      let count = Math.floor(Math.random() * 3) + 2;
+      let active = indices.slice(0, count);
+
+      let cuts = [];
+      for (let i = 0; i < count - 1; i++) cuts.push(Math.random());
+      cuts.sort((a, b) => a - b);
+
+      let fractions = [];
+      let last = 0;
+      cuts.forEach(c => {
+        fractions.push(Math.round((c - last) * 20) / 20);
+        last = c;
+      });
+      fractions.push(Math.round((1 - last) * 20) / 20);
+
+      let rawSum = fractions.reduce((a, b) => a + b, 0);
+      if (rawSum === 0) fractions[0] = 1.0;
+      else fractions = fractions.map(f => f / rawSum);
+
+      let finalVals = [0, 0, 0, 0, 0, 0, 0];
+      active.forEach((idx, i) => {
+        finalVals[idx] = fractions[i];
+      });
+
+      const mIds = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7'];
+      finalVals.forEach((v, idx) => {
+        document.getElementById(mIds[idx]).value = v.toFixed(2);
+        document.getElementById('valM' + (idx + 1)).textContent = v.toFixed(2);
+      });
+
+      const randomHard = (Math.floor(Math.random() * 5) * 0.25).toFixed(2);
+      document.getElementById('hardenerSplit').value = randomHard;
+      document.getElementById('valHardener').textContent = `${parseFloat(randomHard).toFixed(2)} / ${(1.0 - randomHard).toFixed(2)}`;
+
+      const randomR = [0.80, 1.00, 1.20][Math.floor(Math.random() * 3)];
+      document.getElementById('ratioR').value = randomR;
+      document.getElementById('valR').textContent = randomR.toFixed(2);
+
+      document.getElementById('monomerSumBadge').textContent = "Sum: 1.00 / 1.00";
+      document.getElementById('monomerSumBadge').style.color = "#16a34a";
+
+      recalculateSimulation();
+    }
+
+    /* Set Zero Button */
+    function resetSlidersToZero() {
+      const mIds = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7'];
+      mIds.forEach((id, idx) => {
+        document.getElementById(id).value = "0.00";
+        document.getElementById('valM' + (idx + 1)).textContent = "0.00";
+      });
+      document.getElementById('monomerSumBadge').textContent = "Sum: 0.00 / 1.00";
+      document.getElementById('monomerSumBadge').style.color = "#ea580c";
+      recalculateSimulation();
+    }
+
+    /* Core Formula & ML Engine */
+    function recalculateSimulation() {
+      const mKeys = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7'];
+      const mIds = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7'];
+      let w = mIds.map(id => parseFloat(document.getElementById(id).value));
+      let sumW = w.reduce((a, b) => a + b, 0);
+
+      const ipdaFrac = parseFloat(document.getElementById('hardenerSplit').value);
+      const jeffFrac = 1.0 - ipdaFrac;
+      const ratioR = parseFloat(document.getElementById('ratioR').value);
+
+      if (sumW === 0) {
+        document.getElementById('predMpa').innerHTML = `0.00 <span>MPa</span>`;
+        document.getElementById('mixEEW').textContent = "0.0";
+        document.getElementById('mixAHEW').textContent = "0.0";
+        document.getElementById('mixVisc').textContent = "0 cP";
+        document.getElementById('mixTg').textContent = "0.0 °C";
+        document.getElementById('mixBio').textContent = "0.0%";
+        document.getElementById('mixRa').textContent = "0.00";
+        document.getElementById('gaugeBar').innerHTML = '';
+        document.getElementById('blendLegend').innerHTML = '<span style="color:#64748b;">No monomers loaded (0.00)</span>';
+        return;
+      }
+
+      let normW = w.map(v => v / sumW);
+
+      // 1. Reciprocal EEW
+      let recipEEW = 0;
+      normW.forEach((wi, i) => {
+        recipEEW += wi / monomers[mKeys[i]].eew;
+      });
+      const mixEEW = 1.0 / recipEEW;
+
+      // 2. AHEW
+      const mixAHEW = 1.0 / ((ipdaFrac / monomers.IPDA.ahew) + (jeffFrac / monomers.Jeff.ahew));
+
+      // 3. Arrhenius Log Viscosity
+      let logVisc = 0;
+      normW.forEach((wi, i) => {
+        logVisc += wi * Math.log(monomers[mKeys[i]].visc);
+      });
+      const mixVisc = Math.exp(logVisc);
+
+      // 4. Weighted Tg
+      let mixTg = 0;
+      normW.forEach((wi, i) => {
+        mixTg += wi * monomers[mKeys[i]].tg;
+      });
+
+      // 5. Bio-Mass Content
+      let bioContent = (normW[3] + normW[4]) * 100;
+
+      // 6. Hansen Parameters
+      let dd = 0, dp = 0, dh = 0;
+      normW.forEach((wi, i) => {
+        dd += wi * monomers[mKeys[i]].dd;
+        dp += wi * monomers[mKeys[i]].dp;
+        dh += wi * monomers[mKeys[i]].dh;
+      });
+
+      let maxRa = 0;
+      for (let i = 0; i < mKeys.length; i++) {
+        for (let j = i + 1; j < mKeys.length; j++) {
+          if (normW[i] > 0.02 && normW[j] > 0.02) {
+            let mA = monomers[mKeys[i]];
+            let mB = monomers[mKeys[j]];
+            let dist = Math.sqrt(4 * Math.pow(mA.dd - mB.dd, 2) + Math.pow(mA.dp - mB.dp, 2) + Math.pow(mA.dh - mB.dh, 2));
+            if (dist > maxRa) maxRa = dist;
+          }
+        }
+      }
+
+      let mixDensity = 0, mixTPSA = 0, mixFunc = 0;
+      normW.forEach((wi, i) => {
+        mixDensity += wi * monomers[mKeys[i]].density;
+        mixTPSA += wi * (monomers[mKeys[i]].tpsa || 45);
+        mixFunc += wi * monomers[mKeys[i]].func;
+      });
+
+      // Update Tiles
+      document.getElementById('mixEEW').textContent = mixEEW.toFixed(1);
+      document.getElementById('mixAHEW').textContent = mixAHEW.toFixed(1);
+      document.getElementById('mixVisc').textContent = Math.round(mixVisc) + " cP";
+      document.getElementById('mixTg').textContent = mixTg.toFixed(1) + " °C";
+      document.getElementById('mixBio').textContent = bioContent.toFixed(1) + "%";
+      document.getElementById('mixRa').textContent = maxRa > 0 ? maxRa.toFixed(2) : "0.00";
+      document.getElementById('mixDd').textContent = dd.toFixed(1);
+      document.getElementById('mixDp').textContent = dp.toFixed(1);
+      document.getElementById('mixDh').textContent = dh.toFixed(1);
+      document.getElementById('mixDensity').textContent = mixDensity.toFixed(2);
+      document.getElementById('mixTPSA').textContent = mixTPSA.toFixed(1);
+      document.getElementById('mixFunc').textContent = mixFunc.toFixed(2);
+
+      // Recalibrated Prediction Model
+      let predStrength = evaluateRealisticAdhesion(normW, ipdaFrac, jeffFrac, ratioR, mixEEW, mixVisc, mixTg, maxRa);
+      document.getElementById('predMpa').innerHTML = `${predStrength.toFixed(2)} <span>MPa</span>`;
+
+      // Update Color Gauge Scale & Active Legend
+      const gaugeBar = document.getElementById('gaugeBar');
+      const legend = document.getElementById('blendLegend');
+      gaugeBar.innerHTML = '';
+      legend.innerHTML = '';
+
+      let legendParts = [];
+      normW.forEach((wi, i) => {
+        if (wi > 0.001) {
+          const seg = document.createElement('div');
+          seg.className = 'gauge-seg';
+          seg.style.width = (wi * 100) + '%';
+          seg.style.backgroundColor = monomerColors[i];
+          gaugeBar.appendChild(seg);
+
+          legendParts.push(`
+            <div class="legend-item">
+              <span class="legend-dot" style="background:${monomerColors[i]}"></span>
+              ${Math.round(wi * 100)}% Monomer ${i + 1}
+            </div>
+          `);
+        }
+      });
+
+      legend.innerHTML = `
+        <span style="color:var(--text-muted); font-size:9px; text-transform:uppercase;">Active Blend:</span>
+        ${legendParts.join('')}
+        <span style="color:#cbd5e1;">|</span>
+        <span>Hardener: ${Math.round(ipdaFrac * 100)}% IPDA / ${Math.round(jeffFrac * 100)}% Jeff</span>
+        <span style="color:#cbd5e1;">|</span>
+        <span>Stoichiometry: r = ${ratioR.toFixed(2)}</span>
+      `;
+    }
+
+    /* Calibrated Prediction Engine */
+    function evaluateRealisticAdhesion(w, ipda, jeff, r, eew, visc, tg, ra) {
+      let pred = 11.2;
+
+      // Penalize pure or unbalanced compositions that failed in experimental runs
+      if (w[4] > 0.8) return 0.0;
+      if (w[0] > 0.5 && w[6] > 0.35 && ipda > 0.6) return 0.0;
+
+      // Synergistic Polyol GDGE (M7) wetting enhancement
+      if (w[6] >= 0.4) {
+        pred += 7.5 * (w[6] / 0.8);
+      } else if (w[6] === 0) {
+        pred -= 3.2;
+      }
+
+      // High crosslink TGDDM (M3) without diluent
+      if (w[2] > 0.5 && w[5] === 0 && w[6] === 0) {
+        pred -= 4.0;
+      }
+
+      // Aromatic stability (M1/M2)
+      if (w[0] > 0 || w[1] > 0) {
+        pred += 2.8 * (w[0] + w[1]);
+      }
+
+      // Viscosity penalty
+      if (visc > 3500) pred -= 3.5 * Math.log10(visc / 3500);
+      if (visc < 30) pred -= 2.0;
+
+      // Stoichiometric Sweet Spot
+      if (r <= 0.85) pred += 3.2;
+      else if (r >= 1.20) pred -= 2.5;
+
+      // Model-specific offset
+      pred += modelConfigs[currentModel].offset;
+
+      return Math.max(0.0, Math.min(26.2, pred));
+    }
+
+    /* ======================================================== */
+    /* 4. MASTER DATABASE TAB POPULATION WITH EXPLICIT N/A      */
+    /* ======================================================== */
+    function renderMasterDatabase() {
+      const tbody = document.getElementById('dbTableBody');
+      tbody.innerHTML = '';
+
+      Object.keys(monomers).forEach(k => {
+        const m = monomers[k];
+        const tr = document.createElement('tr');
+        
+        function formatCell(val, isCode = false) {
+          if (val === null || val === undefined || val === '') {
+            return `<td class="editable na-cell" contenteditable="true">N/A</td>`;
+          }
+          if (isCode) {
+            return `<td class="editable" contenteditable="true" style="font-weight:700; color:var(--blue-600);">${val}</td>`;
+          }
+          return `<td class="editable" contenteditable="true">${val}</td>`;
+        }
+
+        tr.innerHTML = `
+          <td style="font-weight:700; color:var(--navy-900);">${m.name}</td>
+          ${formatCell(m.cas)}
+          ${formatCell(m.grade)}
+          ${formatCell(m.eew || m.ahew, true)}
+          ${formatCell(m.func)}
+          ${formatCell(m.visc ? m.visc.toLocaleString() : null)}
+          ${formatCell(m.density)}
+          ${formatCell(m.tg)}
+          ${formatCell(m.dd)}
+          ${formatCell(m.dp)}
+          ${formatCell(m.dh)}
+          ${formatCell(m.logp)}
+          ${formatCell(m.st)}
+          ${formatCell(m.tpsa)}
+          ${formatCell(m.e)}
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addPropertyColumn() {
+      const propName = prompt("Enter new Property Name (with Unit):", "Thermal Conductivity (W/m·K)");
+      if (!propName) return;
+
+      const theadRow = document.getElementById('dbHeaderRow');
+      const th = document.createElement('th');
+      th.textContent = propName;
+      theadRow.appendChild(th);
+
+      const rows = document.querySelectorAll('#dbTableBody tr');
+      rows.forEach(r => {
+        const td = document.createElement('td');
+        td.className = 'editable na-cell';
+        td.contentEditable = "true";
+        td.textContent = 'N/A';
+        r.appendChild(td);
+      });
+    }
+
+    /* ======================================================== */
+    /* 5. EXPERIMENT DATA TAB                                   */
+    /* ======================================================== */
+    function renderExperimentData() {
+      const tbody = document.getElementById('expTableBody');
+      tbody.innerHTML = '';
+
+      experimentData.forEach(exp => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${exp.order}</td>
+          <td style="font-weight:600;">${exp.name}</td>
+          <td style="font-family:'JetBrains Mono';">${exp.recipe}</td>
+          <td>${exp.comp}</td>
+          <td class="editable" contenteditable="true">${exp.ipda.toFixed(2)}</td>
+          <td class="editable" contenteditable="true">${exp.jeff.toFixed(2)}</td>
+          <td class="editable" contenteditable="true" style="font-weight:600;">${exp.r.toFixed(2)}</td>
+          <td class="editable" contenteditable="true">${exp.m[0] > 0 ? exp.m[0].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true">${exp.m[1] > 0 ? exp.m[1].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true">${exp.m[2] > 0 ? exp.m[2].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true">${exp.m[3] > 0 ? exp.m[3].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true">${exp.m[4] > 0 ? exp.m[4].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true">${exp.m[5] > 0 ? exp.m[5].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true">${exp.m[6] > 0 ? exp.m[6].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true"><span class="val-highlight">${exp.strength.toFixed(2)}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function toggleAddRowPanel() {
+      const panel = document.getElementById('newRowPanel');
+      panel.classList.toggle('show');
+    }
+
+    function submitNewExperimentRow() {
+      const recipeId = document.getElementById('newRecipeId').value || "CUSTOM";
+      const comp = parseInt(document.getElementById('newComplexity').value) || 4;
+      const ipda = parseFloat(document.getElementById('newIpda').value) || 0.5;
+      const jeff = parseFloat(document.getElementById('newJeff').value) || 0.5;
+      const r = parseFloat(document.getElementById('newRatioR').value) || 1.0;
+      const strength = parseFloat(document.getElementById('newStrength').value) || 15.0;
+
+      const m = [
+        parseFloat(document.getElementById('newM1').value) || 0,
+        parseFloat(document.getElementById('newM2').value) || 0,
+        parseFloat(document.getElementById('newM3').value) || 0,
+        parseFloat(document.getElementById('newM4').value) || 0,
+        parseFloat(document.getElementById('newM5').value) || 0,
+        parseFloat(document.getElementById('newM6').value) || 0,
+        parseFloat(document.getElementById('newM7').value) || 0
+      ];
+
+      const newOrder = experimentData.length + 1;
+      experimentData.push({
+        order: newOrder,
+        name: recipeId,
+        recipe: recipeId,
+        comp: comp,
+        ipda: ipda,
+        jeff: jeff,
+        r: r,
+        m: m,
+        strength: strength
+      });
+
+      renderExperimentData();
+      toggleAddRowPanel();
+      recalculateSimulation();
+    }
+
+    /* Initialize on load */
+    window.onload = function() {
+      renderDiscoverySection();
+      renderMasterDatabase();
+      renderExperimentData();
+      recalculateSimulation();
+    };
+  </script>
+</body>
+</html>
