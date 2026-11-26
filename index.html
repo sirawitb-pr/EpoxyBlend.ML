@@ -1413,7 +1413,7 @@
           <!-- 2. DATA UPDATING -->
           <rect x="195" y="20" width="150" height="85" rx="6" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
           <text x="203" y="38" font-family="'Plus Jakarta Sans', sans-serif" font-weight="800" font-size="10" fill="#0f172a">2. DATA UPDATING</text>
-          <text x="203" y="55" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• Monomer &amp; Hardener Database</text>
+          <text x="203" y="55" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• Monomer &amp; Hardener DB</text>
           <text x="203" y="70" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">• Experimental Adhesive</text>
           <text x="203" y="83" font-family="'Plus Jakarta Sans', sans-serif" font-size="8.5" fill="#64748b">  Shear Strength Database</text>
 
@@ -1483,7 +1483,7 @@
           <span class="stage-card-num">Step 2</span>
           <div class="stage-card-title">2. DATA UPDATING</div>
           <div class="stage-card-p">
-            • <strong>Monomer &amp; Hardener Database:</strong> Curates pure physical, topological &amp; Hansen properties.<br>
+            • <strong>Monomer &amp; Hardener DB:</strong> Curates pure physical, topological &amp; Hansen properties.<br>
             • <strong>Experiment Database:</strong> Aggregates compounding runs and measured strengths.
           </div>
         </div>
@@ -1525,15 +1525,15 @@
     const monomerColors = ['#3b82f6', '#06b6d4', '#8b5cf6', '#10b981', '#f59e0b', '#ec4899', '#6366f1'];
 
     const monomers = {
-      M1: { name: "Bisphenol A Diglycidyl Ether (DGEBA)", cas: "1675-54-3", grade: "Epon 828 / DER 331", eew: 188, func: 2, visc: 12000, density: 1.16, tg: 150, dd: 18.7, dp: 7.6, dh: 7.3, logp: 3.84, st: 44, tpsa: 43.5, e: 3.1 },
-      M2: { name: "Bisphenol F Diglycidyl Ether (DGEBF)", cas: "2095-03-6", grade: "Epon 862 / DER 354", eew: 170, func: 2, visc: 3500, density: 1.18, tg: 145, dd: 19.0, dp: 7.8, dh: 7.2, logp: 3.26, st: 43, tpsa: 43.5, e: 3.0 },
-      M3: { name: "Tetraglycidyl 4,4'-Diaminodiphenylmethane (TGDDM)", cas: "28768-32-4", grade: "Araldite MY 721", eew: 115, func: 4, visc: 50000, density: 1.15, tg: 220, dd: 19.4, dp: 8.2, dh: 6.8, logp: 2.15, st: null, tpsa: 56.6, e: 3.8 },
-      M4: { name: "Isosorbide Diglycidyl Ether (ISDGE)", cas: "30416-24-1", grade: "Bio-Isosorbide Epoxy", eew: 130, func: 2, visc: 760, density: 1.21, tg: 110, dd: 17.5, dp: 9.1, dh: 8.5, logp: -0.45, st: null, tpsa: 62.0, e: null },
-      M5: { name: "Epoxidized Cardanol Oil", cas: "101316-24-9", grade: "Cardolite NC-514", eew: 400, func: 2, visc: 50, density: 0.98, tg: 25, dd: 16.5, dp: 3.2, dh: 4.1, logp: 7.50, st: 31, tpsa: null, e: 0.2 },
-      M6: { name: "1,4-Butanediol Diglycidyl Ether (BDDGE)", cas: "2425-79-8", grade: "Heloxy 67 / DY-D", eew: 130, func: 2, visc: 15, density: 1.10, tg: -20, dd: 16.5, dp: 6.8, dh: 7.5, logp: 0.65, st: 36, tpsa: 43.5, e: null },
-      M7: { name: "Glycerol Diglycidyl Ether (GDGE)", cas: "2238-07-5", grade: "Denacol EX-313", eew: 143, func: 3, visc: 20, density: 1.20, tg: -10, dd: 16.8, dp: 8.5, dh: 9.2, logp: -0.82, st: null, tpsa: null, e: null },
-      IPDA: { name: "Isophorone Diamine (IPDA)", cas: "2855-13-2", grade: "Vestamin IPD", ahew: 42.6, func: 4, visc: 15, density: 0.92, tg: null, dd: 16.8, dp: 5.2, dh: 9.8, logp: 0.99, st: null, tpsa: 52.0, e: null },
-      Jeff: { name: "Polyoxypropylenediamine (Jeffamine D230)", cas: "9046-10-0", grade: "Jeffamine D-230", ahew: 60.0, func: 4, visc: 10, density: 0.95, tg: null, dd: 16.2, dp: 4.5, dh: 8.4, logp: 0.40, st: null, tpsa: null, e: null }
+      M1: { name: "Bisphenol A Diglycidyl Ether (DGEBA)", cas: "1675-54-3", grade: "Epon 828 / DER 331", eew: 188, func: 2, visc: 12000, density: 1.16, tg: 150, dd: 18.7, dp: 7.6, dh: 7.3, logp: 3.84, st: null, tpsa: 43.5, e: 3.1 },
+      M2: { name: "Bisphenol F Diglycidyl Ether (DGEBF)", cas: "2095-03-6", grade: "Epon 862 / DER 354", eew: 170, func: 2, visc: 3500, density: 1.18, tg: 145, dd: 19.0, dp: 7.8, dh: 7.2, logp: null, st: null, tpsa: null, e: 3.0 },
+      M3: { name: "Tetraglycidyl 4,4'-Diaminodiphenylmethane (TGDDM)", cas: "28768-32-4", grade: "Araldite MY 721", eew: 115, func: 4, visc: 50000, density: 1.15, tg: 220, dd: 19.4, dp: 8.2, dh: 6.8, logp: null, st: null, tpsa: null, e: null },
+      M4: { name: "Isosorbide Diglycidyl Ether (ISDGE)", cas: "30416-24-1", grade: "Bio-Isosorbide Epoxy", eew: 130, func: 2, visc: 760, density: 1.21, tg: 110, dd: null, dp: null, dh: null, logp: -0.45, st: null, tpsa: null, e: null },
+      M5: { name: "Epoxidized Cardanol Oil", cas: "101316-24-9", grade: "Cardolite NC-514", eew: 400, func: 2, visc: 50, density: 0.98, tg: 25, dd: 16.5, dp: 3.2, dh: 4.1, logp: null, st: null, tpsa: null, e: null },
+      M6: { name: "1,4-Butanediol Diglycidyl Ether (BDDGE)", cas: "2425-79-8", grade: "Heloxy 67 / DY-D", eew: 130, func: 2, visc: 15, density: 1.10, tg: -20, dd: 16.5, dp: 6.8, dh: 7.5, logp: null, st: null, tpsa: null, e: null },
+      M7: { name: "Glycerol Diglycidyl Ether (GDGE)", cas: "2238-07-5", grade: "Denacol EX-313", eew: 143, func: 3, visc: 20, density: 1.20, tg: -10, dd: null, dp: null, dh: null, logp: null, st: null, tpsa: null, e: null },
+      IPDA: { name: "Isophorone Diamine (IPDA)", cas: "2855-13-2", grade: "Vestamin IPD", ahew: 42.6, func: 4, visc: 15, density: 0.92, tg: null, dd: 16.8, dp: 5.2, dh: 9.8, logp: null, st: null, tpsa: null, e: null },
+      Jeff: { name: "Polyoxypropylenediamine (Jeffamine D230)", cas: "9046-10-0", grade: "Jeffamine D-230", ahew: 60.0, func: 4, visc: 10, density: 0.95, tg: null, dd: null, dp: null, dh: null, logp: null, st: null, tpsa: null, e: null }
     };
 
     // 32 Experimental Runs
@@ -1853,18 +1853,19 @@
       // 4. Weighted Tg
       let mixTg = 0;
       normW.forEach((wi, i) => {
-        mixTg += wi * monomers[mKeys[i]].tg;
+        let monomerTg = monomers[mKeys[i]].tg;
+        mixTg += wi * (monomerTg !== null && monomerTg !== undefined ? monomerTg : 50);
       });
 
       // 5. Bio-Mass Content
       let bioContent = (normW[3] + normW[4]) * 100;
 
-      // 6. Hansen Parameters
+      // 6. Hansen Parameters (Fall back gracefully if literature N/A)
       let dd = 0, dp = 0, dh = 0;
       normW.forEach((wi, i) => {
-        dd += wi * monomers[mKeys[i]].dd;
-        dp += wi * monomers[mKeys[i]].dp;
-        dh += wi * monomers[mKeys[i]].dh;
+        dd += wi * (monomers[mKeys[i]].dd || 17.5);
+        dp += wi * (monomers[mKeys[i]].dp || 7.0);
+        dh += wi * (monomers[mKeys[i]].dh || 7.0);
       });
 
       let maxRa = 0;
@@ -1873,7 +1874,9 @@
           if (normW[i] > 0.02 && normW[j] > 0.02) {
             let mA = monomers[mKeys[i]];
             let mB = monomers[mKeys[j]];
-            let dist = Math.sqrt(4 * Math.pow(mA.dd - mB.dd, 2) + Math.pow(mA.dp - mB.dp, 2) + Math.pow(mA.dh - mB.dh, 2));
+            let mAdd = mA.dd || 17.5, mAdp = mA.dp || 7.0, mAdh = mA.dh || 7.0;
+            let mBdd = mB.dd || 17.5, mBdp = mB.dp || 7.0, mBdh = mB.dh || 7.0;
+            let dist = Math.sqrt(4 * Math.pow(mAdd - mBdd, 2) + Math.pow(mAdp - mBdp, 2) + Math.pow(mAdh - mBdh, 2));
             if (dist > maxRa) maxRa = dist;
           }
         }
@@ -1987,7 +1990,7 @@
       Object.keys(monomers).forEach(k => {
         const m = monomers[k];
         const tr = document.createElement('tr');
-        
+
         function formatCell(val, isCode = false) {
           if (val === null || val === undefined || val === '') {
             return `<td class="editable na-cell" contenteditable="true">N/A</td>`;
