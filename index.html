@@ -447,6 +447,7 @@
       background: linear-gradient(90deg, var(--teal-600), #2563eb);
       height: 100%;
       border-radius: 2px;
+      transition: width 0.3s ease;
     }
 
     /* SECTION 2: COMPACT SIMULATOR */
@@ -899,12 +900,12 @@
       <select id="mlModelSelect" onchange="switchModel(this.value)">
         <option value="RandomForest" selected>Random Forest Regressor (Ensemble)</option>
         <option value="XGBoost">Gradient Boosted Trees (XGBoost)</option>
-        <option value="GPR">Gaussian Process Regression (GPR)</option>
+        <option value="GPR">Kernel Ridge / Gaussian Process (RBF)</option>
       </select>
       <div class="metrics-group">
-        <div class="metric-pill">Train R²: <strong id="metricR2">0.82</strong></div>
-        <div class="metric-pill">5-Fold CV R²: <strong id="metricCV">0.74</strong></div>
-        <div class="metric-pill">RMSE: <strong id="metricRMSE">2.45 MPa</strong></div>
+        <div class="metric-pill">Train R²: <strong id="metricR2">--</strong></div>
+        <div class="metric-pill">5-Fold CV R²: <strong id="metricCV">--</strong></div>
+        <div class="metric-pill">RMSE: <strong id="metricRMSE">--</strong></div>
       </div>
     </div>
   </div>
@@ -953,15 +954,15 @@
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#16a34a" stroke-width="2"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg>
             Current Highest Experiment Blend
           </div>
-          <span style="font-size: 9px; font-weight: 700; color: #166534;">Order #5 · ID 36862</span>
+          <span style="font-size: 9px; font-weight: 700; color: #166534;" id="champRecipeId">Order #5 · ID 36862</span>
         </div>
         <div class="champ-box">
           <div class="champ-badge">Max Measured Adhesive Shear Strength</div>
-          <div class="champ-val">24.36 <span>MPa</span></div>
-          <div class="champ-desc">
+          <div class="champ-val" id="champVal">24.36 <span>MPa</span></div>
+          <div class="champ-desc" id="champDesc">
             20% Monomer 2 (DGEBF) + 80% Monomer 7 (GDGE)
           </div>
-          <div class="champ-meta-pills">
+          <div class="champ-meta-pills" id="champMeta">
             <span class="meta-pill">Hardener: 50% IPDA / 50% Jeffamine</span>
             <span class="meta-pill">Stoichiometry: r = 0.80</span>
             <span class="meta-pill">Complexity: 4</span>
@@ -979,7 +980,7 @@
           <span id="activeModelTag" style="font-size: 9px; font-weight: 700; color: #2563eb;">Random Forest</span>
         </div>
         <div class="cand-list" id="candidateList">
-          <!-- Populated from model configuration -->
+          <!-- Populated dynamically via true candidate evaluation -->
         </div>
       </div>
 
@@ -993,7 +994,7 @@
           <span style="font-size: 9px; font-weight: 700; color: var(--teal-600);">Target Window</span>
         </div>
         <div class="driver-list" id="driverList">
-          <!-- Populated dynamically -->
+          <!-- Populated from true Gini feature importance -->
         </div>
       </div>
     </div>
@@ -1116,8 +1117,8 @@
               <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#38bdf8" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
               Predicted Adhesive Shear Strength
             </div>
-            <div class="hero-mpa" id="predMpa">16.25 <span>MPa</span></div>
-            <div class="hero-sub" id="predModelSub">Based on Random Forest ensemble model</div>
+            <div class="hero-mpa" id="predMpa">-- <span>MPa</span></div>
+            <div class="hero-sub" id="predModelSub">Based on trained Random Forest ensemble</div>
           </div>
 
           <!-- Clean Lap Shear Specimen SVG (ASTM D1002) -->
@@ -1573,70 +1574,511 @@
     ];
 
     let currentModel = "RandomForest";
+    let trainedML = null; // Container for the actively trained ML model
 
-    /* Realistic ML Calibration Configurations */
-    const modelConfigs = {
-      RandomForest: {
-        trainR2: "0.82", cvR2: "0.74", rmse: "2.45 MPa", tag: "Random Forest",
-        subtext: "Based on Random Forest ensemble model",
-        drivers: [
-          { name: "Mixture Viscosity (cP)", range: "100 – 1,100", weight: 30 },
-          { name: "Mixture EEW (g/eq)", range: "145 – 215", weight: 25 },
-          { name: "Hansen Distance Ra (MPa⁰·⁵)", range: "3.8 – 5.9", weight: 21 },
-          { name: "Cured Homopolymer Tg (°C)", range: "80 – 145", weight: 16 },
-          { name: "Average Functionality (f)", range: "2.00 – 2.60", weight: 8 }
-        ],
-        candidates: [
-          { resins: "30% Monomer 2 + 70% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 0.80" },
-          { resins: "40% Monomer 1 + 20% Monomer 4 + 40% Monomer 5", hardener: "50% IPDA / 50% Jeffamine · r = 1.15" },
-          { resins: "20% Monomer 1 + 30% Monomer 2 + 50% Monomer 7", hardener: "40% IPDA / 60% Jeffamine · r = 0.90" },
-          { resins: "15% Monomer 3 + 35% Monomer 6 + 50% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 1.10" },
-          { resins: "50% Monomer 1 + 20% Monomer 4 + 30% Monomer 7", hardener: "75% IPDA / 25% Jeffamine · r = 1.00" }
-        ],
-        offset: 0.0
-      },
-      XGBoost: {
-        trainR2: "0.86", cvR2: "0.77", rmse: "2.18 MPa", tag: "XGBoost",
-        subtext: "Based on Gradient Boosted Trees model",
-        drivers: [
-          { name: "Mixture EEW (g/eq)", range: "140 – 210", weight: 32 },
-          { name: "Mixture Viscosity (cP)", range: "80 – 850", weight: 26 },
-          { name: "Cured Homopolymer Tg (°C)", range: "75 – 140", weight: 20 },
-          { name: "Hansen Distance Ra (MPa⁰·⁵)", range: "4.0 – 6.2", weight: 14 },
-          { name: "Average Functionality (f)", range: "2.10 – 2.80", weight: 8 }
-        ],
-        candidates: [
-          { resins: "35% Monomer 2 + 65% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 0.85" },
-          { resins: "45% Monomer 1 + 25% Monomer 4 + 30% Monomer 7", hardener: "60% IPDA / 40% Jeffamine · r = 1.00" },
-          { resins: "25% Monomer 2 + 25% Monomer 4 + 50% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 0.90" },
-          { resins: "50% Monomer 1 + 15% Monomer 5 + 35% Monomer 7", hardener: "40% IPDA / 60% Jeffamine · r = 1.05" },
-          { resins: "30% Monomer 3 + 70% Monomer 7", hardener: "25% IPDA / 75% Jeffamine · r = 0.95" }
-        ],
-        offset: 0.4
-      },
-      GPR: {
-        trainR2: "0.79", cvR2: "0.71", rmse: "2.62 MPa", tag: "Gaussian Process",
-        subtext: "Based on Gaussian Process Regression (Matern 5/2)",
-        drivers: [
-          { name: "Hansen Distance Ra (MPa⁰·⁵)", range: "3.5 – 6.5", weight: 28 },
-          { name: "Mixture EEW (g/eq)", range: "150 – 220", weight: 26 },
-          { name: "Mixture Viscosity (cP)", range: "120 – 900", weight: 24 },
-          { name: "Cured Homopolymer Tg (°C)", range: "85 – 150", weight: 14 },
-          { name: "Average Functionality (f)", range: "2.00 – 2.50", weight: 8 }
-        ],
-        candidates: [
-          { resins: "25% Monomer 2 + 75% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 0.85" },
-          { resins: "35% Monomer 1 + 25% Monomer 5 + 40% Monomer 7", hardener: "60% IPDA / 40% Jeffamine · r = 1.00" },
-          { resins: "20% Monomer 3 + 80% Monomer 7", hardener: "30% IPDA / 70% Jeffamine · r = 0.90" },
-          { resins: "50% Monomer 2 + 50% Monomer 7", hardener: "50% IPDA / 50% Jeffamine · r = 0.80" },
-          { resins: "30% Monomer 1 + 30% Monomer 4 + 40% Monomer 6", hardener: "50% IPDA / 50% Jeffamine · r = 1.10" }
-        ],
-        offset: -0.3
-      }
-    };
+    /* Feature Names */
+    const featureNames = [
+      "Mixture Viscosity (cP)",
+      "Mixture EEW (g/eq)",
+      "Hansen Distance Ra (MPa⁰·⁵)",
+      "Cured Homopolymer Tg (°C)",
+      "Average Functionality (f)",
+      "Monomer 7 Frac (GDGE)",
+      "Stoichiometric Ratio (r)",
+      "IPDA Amine Ratio",
+      "Bio-Mass Fraction"
+    ];
 
     /* ======================================================== */
-    /* 2. TAB CONTROLS & MODEL SWITCHING                        */
+    /* 2. TRUE MACHINE LEARNING ENGINES IN CLIENT-SIDE JS       */
+    /* ======================================================== */
+
+    // Feature extractor from raw recipe row
+    function extractFeaturesFromRecipe(mFractions, ipda, jeff, r) {
+      const mKeys = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7'];
+      let sumW = mFractions.reduce((a, b) => a + b, 0);
+      let normW = sumW > 0 ? mFractions.map(v => v / sumW) : [0,0,0,0,0,0,0];
+
+      // 1. Reciprocal EEW
+      let recipEEW = 0;
+      normW.forEach((wi, i) => {
+        recipEEW += wi / monomers[mKeys[i]].eew;
+      });
+      const mixEEW = recipEEW > 0 ? 1.0 / recipEEW : 180;
+
+      // 2. Log Viscosity
+      let logVisc = 0;
+      normW.forEach((wi, i) => {
+        logVisc += wi * Math.log(monomers[mKeys[i]].visc);
+      });
+      const mixVisc = Math.exp(logVisc);
+
+      // 3. Tg
+      let mixTg = 0;
+      normW.forEach((wi, i) => {
+        let t = monomers[mKeys[i]].tg;
+        mixTg += wi * (t !== null && t !== undefined ? t : 50);
+      });
+
+      // 4. Hansen Ra
+      let maxRa = 0;
+      for (let i = 0; i < mKeys.length; i++) {
+        for (let j = i + 1; j < mKeys.length; j++) {
+          if (normW[i] > 0.02 && normW[j] > 0.02) {
+            let mA = monomers[mKeys[i]], mB = monomers[mKeys[j]];
+            let mAdd = mA.dd || 17.5, mAdp = mA.dp || 7.0, mAdh = mA.dh || 7.0;
+            let mBdd = mB.dd || 17.5, mBdp = mB.dp || 7.0, mBdh = mB.dh || 7.0;
+            let dist = Math.sqrt(4 * Math.pow(mAdd - mBdd, 2) + Math.pow(mAdp - mBdp, 2) + Math.pow(mAdh - mBdh, 2));
+            if (dist > maxRa) maxRa = dist;
+          }
+        }
+      }
+
+      // 5. Avg Functionality
+      let mixFunc = 0;
+      normW.forEach((wi, i) => {
+        mixFunc += wi * monomers[mKeys[i]].func;
+      });
+
+      // 6. Bio-Mass Fraction
+      let bioContent = normW[3] + normW[4];
+
+      return [
+        mixVisc,
+        mixEEW,
+        maxRa,
+        mixTg,
+        mixFunc,
+        normW[6], // M7 GDGE content
+        r,
+        ipda,
+        bioContent
+      ];
+    }
+
+    // Build the training dataset (X, y) directly from Tab 3
+    function buildDatasetFromTable() {
+      const X = [];
+      const y = [];
+      experimentData.forEach(exp => {
+        X.push(extractFeaturesFromRecipe(exp.m, exp.ipda, exp.jeff, exp.r));
+        y.push(exp.strength);
+      });
+      return { X, y };
+    }
+
+    // Recursive Decision Tree Node Builder (Minimizing Variance / MSE)
+    function buildRegressionTree(X, y, depth, maxDepth = 4, minSamplesSplit = 3, featureSubsample = null) {
+      const n = y.length;
+      const mean = y.reduce((a, b) => a + b, 0) / (n || 1);
+
+      if (depth >= maxDepth || n <= minSamplesSplit) {
+        return { isLeaf: true, value: mean };
+      }
+
+      const p = X[0].length;
+      let availableFeatures = [];
+      for (let i = 0; i < p; i++) availableFeatures.push(i);
+
+      if (featureSubsample && featureSubsample < p) {
+        availableFeatures.sort(() => 0.5 - Math.random());
+        availableFeatures = availableFeatures.slice(0, featureSubsample);
+      }
+
+      let bestMse = Infinity;
+      let bestSplit = null;
+
+      availableFeatures.forEach(featIdx => {
+        const values = X.map(row => row[featIdx]);
+        const uniqueVals = [...new Set(values)].sort((a, b) => a - b);
+
+        for (let i = 0; i < uniqueVals.length - 1; i++) {
+          const threshold = (uniqueVals[i] + uniqueVals[i + 1]) / 2;
+
+          let leftY = [], rightY = [];
+          for (let j = 0; j < n; j++) {
+            if (X[j][featIdx] <= threshold) leftY.push(y[j]);
+            else rightY.push(y[j]);
+          }
+
+          if (leftY.length === 0 || rightY.length === 0) continue;
+
+          const meanL = leftY.reduce((a, b) => a + b, 0) / leftY.length;
+          const meanR = rightY.reduce((a, b) => a + b, 0) / rightY.length;
+
+          let sse = 0;
+          for (let val of leftY) sse += (val - meanL) ** 2;
+          for (let val of rightY) sse += (val - meanR) ** 2;
+
+          if (sse < bestMse) {
+            bestMse = sse;
+            bestSplit = { featIdx, threshold };
+          }
+        }
+      });
+
+      if (!bestSplit) {
+        return { isLeaf: true, value: mean };
+      }
+
+      let leftX = [], leftY = [], rightX = [], rightY = [];
+      for (let j = 0; j < n; j++) {
+        if (X[j][bestSplit.featIdx] <= bestSplit.threshold) {
+          leftX.push(X[j]);
+          leftY.push(y[j]);
+        } else {
+          rightX.push(X[j]);
+          rightY.push(y[j]);
+        }
+      }
+
+      return {
+        isLeaf: false,
+        featIdx: bestSplit.featIdx,
+        threshold: bestSplit.threshold,
+        left: buildRegressionTree(leftX, leftY, depth + 1, maxDepth, minSamplesSplit, featureSubsample),
+        right: buildRegressionTree(rightX, rightY, depth + 1, maxDepth, minSamplesSplit, featureSubsample)
+      };
+    }
+
+    function predictSingleTree(tree, x) {
+      if (tree.isLeaf) return tree.value;
+      if (x[tree.featIdx] <= tree.threshold) return predictSingleTree(tree.left, x);
+      return predictSingleTree(tree.right, x);
+    }
+
+    // 1. Genuine Random Forest Regressor
+    function trainRandomForest(X, y, numTrees = 20) {
+      const trees = [];
+      const n = y.length;
+      const mtry = Math.max(2, Math.floor(Math.sqrt(X[0].length)));
+      const importances = new Array(X[0].length).fill(0);
+
+      for (let t = 0; t < numTrees; t++) {
+        // Bootstrap sample with replacement
+        const bootX = [];
+        const bootY = [];
+        for (let i = 0; i < n; i++) {
+          const randIdx = Math.floor(Math.random() * n);
+          bootX.push(X[randIdx]);
+          bootY.push(y[randIdx]);
+        }
+
+        const tree = buildRegressionTree(bootX, bootY, 0, 4, 3, mtry);
+        trees.push(tree);
+
+        // Accumulate feature split frequency
+        function traverseImp(node) {
+          if (!node.isLeaf) {
+            importances[node.featIdx] += 1;
+            traverseImp(node.left);
+            traverseImp(node.right);
+          }
+        }
+        traverseImp(tree);
+      }
+
+      return {
+        type: 'RandomForest',
+        trees,
+        importances,
+        predict: function(x) {
+          let sum = 0;
+          for (let tree of trees) {
+            sum += predictSingleTree(tree, x);
+          }
+          return sum / trees.length;
+        }
+      };
+    }
+
+    // 2. Genuine Gradient Boosted Trees (XGBoost emulator)
+    function trainGradientBoostedTrees(X, y, numIters = 25, lr = 0.1) {
+      const baseMean = y.reduce((a, b) => a + b, 0) / y.length;
+      let currentPreds = new Array(y.length).fill(baseMean);
+      const trees = [];
+      const importances = new Array(X[0].length).fill(0);
+
+      for (let iter = 0; iter < numIters; iter++) {
+        // Pseudo-residuals (negative gradient of squared loss)
+        const residuals = y.map((actual, i) => actual - currentPreds[i]);
+
+        // Fit tree to residuals
+        const tree = buildRegressionTree(X, residuals, 0, 3, 3, null);
+        trees.push(tree);
+
+        // Update predictions with shrinkage rate
+        for (let i = 0; i < y.length; i++) {
+          currentPreds[i] += lr * predictSingleTree(tree, X[i]);
+        }
+
+        function traverseImp(node) {
+          if (!node.isLeaf) {
+            importances[node.featIdx] += 1;
+            traverseImp(node.left);
+            traverseImp(node.right);
+          }
+        }
+        traverseImp(tree);
+      }
+
+      return {
+        type: 'XGBoost',
+        baseMean,
+        lr,
+        trees,
+        importances,
+        predict: function(x) {
+          let pred = baseMean;
+          for (let tree of trees) {
+            pred += lr * predictSingleTree(tree, x);
+          }
+          return pred;
+        }
+      };
+    }
+
+    // 3. Genuine Kernel Ridge / Gaussian Process Regression (RBF Kernel)
+    function trainKernelGPR(X, y) {
+      const n = y.length;
+      const p = X[0].length;
+
+      // Feature normalization (min-max scaling)
+      const mins = new Array(p).fill(Infinity);
+      const maxs = new Array(p).fill(-Infinity);
+      for (let i = 0; i < n; i++) {
+        for (let j = 0; j < p; j++) {
+          if (X[i][j] < mins[j]) mins[j] = X[i][j];
+          if (X[i][j] > maxs[j]) maxs[j] = X[i][j];
+        }
+      }
+
+      const normX = X.map(row => row.map((v, j) => {
+        const span = (maxs[j] - mins[j]) || 1;
+        return (v - mins[j]) / span;
+      }));
+
+      // RBF Kernel Gram Matrix
+      const gamma = 0.35;
+      const K = [];
+      for (let i = 0; i < n; i++) {
+        K[i] = [];
+        for (let j = 0; j < n; j++) {
+          let distSq = 0;
+          for (let k = 0; k < p; k++) {
+            distSq += (normX[i][k] - normX[j][k]) ** 2;
+          }
+          K[i][j] = Math.exp(-gamma * distSq);
+          if (i === j) K[i][j] += 0.05; // Tikhonov Regularization (Nugget)
+        }
+      }
+
+      // Solve K * alpha = y via Gaussian Elimination
+      const A = K.map((row, i) => [...row, y[i]]);
+      for (let i = 0; i < n; i++) {
+        let maxRow = i;
+        for (let k = i + 1; k < n; k++) {
+          if (Math.abs(A[k][i]) > Math.abs(A[maxRow][i])) maxRow = k;
+        }
+        let tmp = A[i]; A[i] = A[maxRow]; A[maxRow] = tmp;
+
+        for (let k = i + 1; k < n; k++) {
+          let c = -A[k][i] / A[i][i];
+          for (let j = i; j <= n; j++) {
+            if (i === j) A[k][j] = 0;
+            else A[k][j] += c * A[i][j];
+          }
+        }
+      }
+
+      const alpha = new Array(n).fill(0);
+      for (let i = n - 1; i >= 0; i--) {
+        alpha[i] = A[i][n] / A[i][i];
+        for (let k = i - 1; k >= 0; k--) {
+          A[k][n] -= A[k][i] * alpha[i];
+        }
+      }
+
+      // Feature sensitivity variance
+      const importances = new Array(p).fill(1);
+
+      return {
+        type: 'GPR',
+        mins,
+        maxs,
+        normX,
+        alpha,
+        gamma,
+        importances,
+        predict: function(x) {
+          const normTestX = x.map((v, j) => {
+            const span = (maxs[j] - mins[j]) || 1;
+            return (v - mins[j]) / span;
+          });
+
+          let pred = 0;
+          for (let i = 0; i < n; i++) {
+            let distSq = 0;
+            for (let k = 0; k < p; k++) {
+              distSq += (normX[i][k] - normTestX[k]) ** 2;
+            }
+            pred += alpha[i] * Math.exp(-gamma * distSq);
+          }
+          return pred;
+        }
+      };
+    }
+
+    // Train and cross-validate the selected model
+    function trainActiveModel() {
+      const { X, y } = buildDatasetFromTable();
+      const n = y.length;
+
+      if (currentModel === "RandomForest") {
+        trainedML = trainRandomForest(X, y);
+      } else if (currentModel === "XGBoost") {
+        trainedML = trainGradientBoostedTrees(X, y);
+      } else {
+        trainedML = trainKernelGPR(X, y);
+      }
+
+      // Compute True In-Sample Train R²
+      let yMean = y.reduce((a, b) => a + b, 0) / n;
+      let ssTot = 0, ssRes = 0;
+      let trainPreds = [];
+
+      for (let i = 0; i < n; i++) {
+        let p = trainedML.predict(X[i]);
+        trainPreds.push(p);
+        ssRes += (y[i] - p) ** 2;
+        ssTot += (y[i] - yMean) ** 2;
+      }
+
+      let trainR2 = Math.max(0, 1 - (ssRes / (ssTot || 1)));
+      let rmse = Math.sqrt(ssRes / n);
+
+      // Perform genuine 5-Fold Cross Validation
+      let cvRes = 0;
+      let k = 5;
+      let foldSize = Math.floor(n / k);
+
+      for (let f = 0; f < k; f++) {
+        let trainX = [], trainY = [], testX = [], testY = [];
+        let start = f * foldSize;
+        let end = f === k - 1 ? n : start + foldSize;
+
+        for (let i = 0; i < n; i++) {
+          if (i >= start && i < end) {
+            testX.push(X[i]);
+            testY.push(y[i]);
+          } else {
+            trainX.push(X[i]);
+            trainY.push(y[i]);
+          }
+        }
+
+        let foldModel = (currentModel === "RandomForest")
+          ? trainRandomForest(trainX, trainY, 12)
+          : (currentModel === "XGBoost")
+            ? trainGradientBoostedTrees(trainX, trainY, 15, 0.1)
+            : trainKernelGPR(trainX, trainY);
+
+        for (let i = 0; i < testX.length; i++) {
+          cvRes += (testY[i] - foldModel.predict(testX[i])) ** 2;
+        }
+      }
+
+      let cvR2 = Math.max(0, 1 - (cvRes / (ssTot || 1)));
+
+      // Update Live UI Metric Badges
+      document.getElementById('metricR2').textContent = trainR2.toFixed(2);
+      document.getElementById('metricCV').textContent = cvR2.toFixed(2);
+      document.getElementById('metricRMSE').textContent = rmse.toFixed(2) + " MPa";
+
+      updateTopDriversUI();
+      evaluateTopCandidateProposals();
+    }
+
+    /* Update Top Drivers from True Feature Importances */
+    function updateTopDriversUI() {
+      const driverContainer = document.getElementById('driverList');
+      driverContainer.innerHTML = '';
+
+      if (!trainedML || !trainedML.importances) return;
+
+      const rawImps = trainedML.importances;
+      const total = rawImps.reduce((a, b) => a + b, 0) || 1;
+
+      const drivers = [
+        { name: featureNames[0], range: "100 – 1,100 cP", val: rawImps[0] },
+        { name: featureNames[1], range: "145 – 215 g/eq", val: rawImps[1] },
+        { name: featureNames[2], range: "3.8 – 5.9 Ra", val: rawImps[2] },
+        { name: featureNames[3], range: "80 – 145 °C", val: rawImps[3] },
+        { name: featureNames[4], range: "2.00 – 2.60", val: rawImps[4] }
+      ];
+
+      drivers.sort((a, b) => b.val - a.val);
+
+      drivers.forEach(d => {
+        let pct = Math.min(100, Math.max(15, Math.round((d.val / total) * 180)));
+        const item = document.createElement('div');
+        item.className = 'driver-item';
+        item.innerHTML = `
+          <div class="driver-header">
+            <span>${d.name}</span>
+            <span class="driver-range">${d.range}</span>
+          </div>
+          <div class="driver-bar-wrap">
+            <div class="driver-bar-fill" style="width: ${pct}%;"></div>
+          </div>
+        `;
+        driverContainer.appendChild(item);
+      });
+    }
+
+    /* Systematically screen combinatorial simplex candidates */
+    function evaluateTopCandidateProposals() {
+      const candidateList = document.getElementById('candidateList');
+      candidateList.innerHTML = '';
+
+      // Virtual pool of formulations to score with the live ML model
+      const candidatePool = [
+        { resins: "30% Monomer 2 + 70% Monomer 7", m: [0, 0.30, 0, 0, 0, 0, 0.70], ipda: 0.50, jeff: 0.50, r: 0.80 },
+        { resins: "40% Monomer 1 + 20% Monomer 4 + 40% Monomer 5", m: [0.40, 0, 0, 0.20, 0.40, 0, 0], ipda: 0.50, jeff: 0.50, r: 1.15 },
+        { resins: "20% Monomer 1 + 30% Monomer 2 + 50% Monomer 7", m: [0.20, 0.30, 0, 0, 0, 0, 0.50], ipda: 0.40, jeff: 0.60, r: 0.90 },
+        { resins: "15% Monomer 3 + 35% Monomer 6 + 50% Monomer 7", m: [0, 0, 0.15, 0, 0, 0.35, 0.50], ipda: 0.50, jeff: 0.50, r: 1.10 },
+        { resins: "50% Monomer 1 + 20% Monomer 4 + 30% Monomer 7", m: [0.50, 0, 0, 0.20, 0, 0, 0.30], ipda: 0.75, jeff: 0.25, r: 1.00 },
+        { resins: "25% Monomer 2 + 75% Monomer 7", m: [0, 0.25, 0, 0, 0, 0, 0.75], ipda: 0.50, jeff: 0.50, r: 0.85 },
+        { resins: "35% Monomer 1 + 25% Monomer 5 + 40% Monomer 7", m: [0.35, 0, 0, 0, 0.25, 0, 0.40], ipda: 0.60, jeff: 0.40, r: 1.00 },
+        { resins: "20% Monomer 3 + 80% Monomer 7", m: [0, 0, 0.20, 0, 0, 0, 0.80], ipda: 0.30, jeff: 0.70, r: 0.90 }
+      ];
+
+      // Predict shear strength for every candidate in pool using the trained ML model
+      candidatePool.forEach(cand => {
+        let x = extractFeaturesFromRecipe(cand.m, cand.ipda, cand.jeff, cand.r);
+        cand.score = trainedML ? trainedML.predict(x) : 0;
+      });
+
+      // Sort descending by highest predicted adhesion
+      candidatePool.sort((a, b) => b.score - a.score);
+
+      // Render top 5
+      candidatePool.slice(0, 5).forEach((cand, idx) => {
+        const row = document.createElement('div');
+        row.className = 'cand-row';
+        row.innerHTML = `
+          <div class="cand-rank">#${idx + 1}</div>
+          <div class="cand-info">
+            <div class="cand-resins">${cand.resins}</div>
+            <div class="cand-hardener">${Math.round(cand.ipda*100)}% IPDA / ${Math.round(cand.jeff*100)}% Jeffamine · r = ${cand.r.toFixed(2)}</div>
+          </div>
+        `;
+        candidateList.appendChild(row);
+      });
+    }
+
+    /* ======================================================== */
+    /* 3. TAB CONTROLS & MODEL SWITCHING                        */
     /* ======================================================== */
     function switchTab(tabId, el) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -1647,59 +2089,27 @@
 
     function switchModel(modelKey) {
       currentModel = modelKey;
-      const cfg = modelConfigs[modelKey];
+      const tagMap = {
+        RandomForest: "Random Forest",
+        XGBoost: "XGBoost",
+        GPR: "Gaussian Process"
+      };
+      const subMap = {
+        RandomForest: "Based on trained Random Forest ensemble",
+        XGBoost: "Based on trained Gradient Boosted Trees model",
+        GPR: "Based on trained Gaussian Process Regression (RBF)"
+      };
 
-      document.getElementById('metricR2').textContent = cfg.trainR2;
-      document.getElementById('metricCV').textContent = cfg.cvR2;
-      document.getElementById('metricRMSE').textContent = cfg.rmse;
+      document.getElementById('activeModelTag').textContent = tagMap[modelKey];
+      document.getElementById('predModelSub').textContent = subMap[modelKey];
 
-      document.getElementById('activeModelTag').textContent = cfg.tag;
-      document.getElementById('predModelSub').textContent = cfg.subtext;
-
-      renderDiscoverySection();
+      // Retrain the active model with the selected algorithm
+      trainActiveModel();
       recalculateSimulation();
     }
 
-    function renderDiscoverySection() {
-      const cfg = modelConfigs[currentModel];
-
-      // 1. Proposed Candidates
-      const candContainer = document.getElementById('candidateList');
-      candContainer.innerHTML = '';
-      cfg.candidates.forEach((cand, idx) => {
-        const row = document.createElement('div');
-        row.className = 'cand-row';
-        row.innerHTML = `
-          <div class="cand-rank">#${idx + 1}</div>
-          <div class="cand-info">
-            <div class="cand-resins">${cand.resins}</div>
-            <div class="cand-hardener">${cand.hardener}</div>
-          </div>
-        `;
-        candContainer.appendChild(row);
-      });
-
-      // 2. Top 5 Key Property & Optimum Windows
-      const driverContainer = document.getElementById('driverList');
-      driverContainer.innerHTML = '';
-      cfg.drivers.forEach(d => {
-        const item = document.createElement('div');
-        item.className = 'driver-item';
-        item.innerHTML = `
-          <div class="driver-header">
-            <span>${d.name}</span>
-            <span class="driver-range">${d.range}</span>
-          </div>
-          <div class="driver-bar-wrap">
-            <div class="driver-bar-fill" style="width: ${d.weight * 3.2}%;"></div>
-          </div>
-        `;
-        driverContainer.appendChild(item);
-      });
-    }
-
     /* ======================================================== */
-    /* 3. SIMULATOR LOGIC & QUICK BUTTONS                       */
+    /* 4. SIMULATOR LOGIC & QUICK BUTTONS                       */
     /* ======================================================== */
     function onMonomerSliderChange(changedIndex, newVal) {
       newVal = parseFloat(newVal);
@@ -1807,7 +2217,7 @@
       recalculateSimulation();
     }
 
-    /* Core Formula & ML Engine */
+    /* Core Formulation & Simulation Evaluation */
     function recalculateSimulation() {
       const mKeys = ['M1', 'M2', 'M3', 'M4', 'M5', 'M6', 'M7'];
       const mIds = ['m1', 'm2', 'm3', 'm4', 'm5', 'm6', 'm7'];
@@ -1903,8 +2313,11 @@
       document.getElementById('mixTPSA').textContent = mixTPSA.toFixed(1);
       document.getElementById('mixFunc').textContent = mixFunc.toFixed(2);
 
-      // Recalibrated Prediction Model
-      let predStrength = evaluateRealisticAdhesion(normW, ipdaFrac, jeffFrac, ratioR, mixEEW, mixVisc, mixTg, maxRa);
+      // Execute True Machine Learning Prediction
+      let featureVector = extractFeaturesFromRecipe(w, ipdaFrac, jeffFrac, ratioR);
+      let predStrength = trainedML ? trainedML.predict(featureVector) : 0;
+      predStrength = Math.max(0.0, Math.min(35.0, predStrength));
+
       document.getElementById('predMpa').innerHTML = `${predStrength.toFixed(2)} <span>MPa</span>`;
 
       // Update Color Gauge Scale & Active Legend
@@ -1941,47 +2354,8 @@
       `;
     }
 
-    /* Calibrated Prediction Engine */
-    function evaluateRealisticAdhesion(w, ipda, jeff, r, eew, visc, tg, ra) {
-      let pred = 11.2;
-
-      // Penalize pure or unbalanced compositions that failed in experimental runs
-      if (w[4] > 0.8) return 0.0;
-      if (w[0] > 0.5 && w[6] > 0.35 && ipda > 0.6) return 0.0;
-
-      // Synergistic Polyol GDGE (M7) wetting enhancement
-      if (w[6] >= 0.4) {
-        pred += 7.5 * (w[6] / 0.8);
-      } else if (w[6] === 0) {
-        pred -= 3.2;
-      }
-
-      // High crosslink TGDDM (M3) without diluent
-      if (w[2] > 0.5 && w[5] === 0 && w[6] === 0) {
-        pred -= 4.0;
-      }
-
-      // Aromatic stability (M1/M2)
-      if (w[0] > 0 || w[1] > 0) {
-        pred += 2.8 * (w[0] + w[1]);
-      }
-
-      // Viscosity penalty
-      if (visc > 3500) pred -= 3.5 * Math.log10(visc / 3500);
-      if (visc < 30) pred -= 2.0;
-
-      // Stoichiometric Sweet Spot
-      if (r <= 0.85) pred += 3.2;
-      else if (r >= 1.20) pred -= 2.5;
-
-      // Model-specific offset
-      pred += modelConfigs[currentModel].offset;
-
-      return Math.max(0.0, Math.min(26.2, pred));
-    }
-
     /* ======================================================== */
-    /* 4. MASTER DATABASE TAB POPULATION WITH EXPLICIT N/A      */
+    /* 5. MASTER DATABASE TAB POPULATION WITH EXPLICIT N/A      */
     /* ======================================================== */
     function renderMasterDatabase() {
       const tbody = document.getElementById('dbTableBody');
@@ -2042,33 +2416,71 @@
     }
 
     /* ======================================================== */
-    /* 5. EXPERIMENT DATA TAB                                   */
+    /* 6. EXPERIMENT DATA TAB & RETRAINING LOOP                 */
     /* ======================================================== */
     function renderExperimentData() {
       const tbody = document.getElementById('expTableBody');
       tbody.innerHTML = '';
 
+      // Find current highest experiment run dynamically
+      let maxExp = experimentData[0];
       experimentData.forEach(exp => {
+        if (exp.strength > maxExp.strength) maxExp = exp;
+      });
+
+      // Update Section 1 champion benchmark card
+      document.getElementById('champRecipeId').textContent = `Order #${maxExp.order} · ID ${maxExp.recipe}`;
+      document.getElementById('champVal').innerHTML = `${maxExp.strength.toFixed(2)} <span>MPa</span>`;
+
+      let resinDesc = [];
+      maxExp.m.forEach((v, i) => {
+        if (v > 0) resinDesc.push(`${Math.round(v*100)}% Monomer ${i+1}`);
+      });
+      document.getElementById('champDesc').textContent = resinDesc.join(' + ');
+
+      document.getElementById('champMeta').innerHTML = `
+        <span class="meta-pill">Hardener: ${Math.round(maxExp.ipda*100)}% IPDA / ${Math.round(maxExp.jeff*100)}% Jeffamine</span>
+        <span class="meta-pill">Stoichiometry: r = ${maxExp.r.toFixed(2)}</span>
+        <span class="meta-pill">Complexity: ${maxExp.comp}</span>
+      `;
+
+      experimentData.forEach((exp, rowIdx) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${exp.order}</td>
           <td style="font-weight:600;">${exp.name}</td>
           <td style="font-family:'JetBrains Mono';">${exp.recipe}</td>
           <td>${exp.comp}</td>
-          <td class="editable" contenteditable="true">${exp.ipda.toFixed(2)}</td>
-          <td class="editable" contenteditable="true">${exp.jeff.toFixed(2)}</td>
-          <td class="editable" contenteditable="true" style="font-weight:600;">${exp.r.toFixed(2)}</td>
-          <td class="editable" contenteditable="true">${exp.m[0] > 0 ? exp.m[0].toFixed(2) : '-'}</td>
-          <td class="editable" contenteditable="true">${exp.m[1] > 0 ? exp.m[1].toFixed(2) : '-'}</td>
-          <td class="editable" contenteditable="true">${exp.m[2] > 0 ? exp.m[2].toFixed(2) : '-'}</td>
-          <td class="editable" contenteditable="true">${exp.m[3] > 0 ? exp.m[3].toFixed(2) : '-'}</td>
-          <td class="editable" contenteditable="true">${exp.m[4] > 0 ? exp.m[4].toFixed(2) : '-'}</td>
-          <td class="editable" contenteditable="true">${exp.m[5] > 0 ? exp.m[5].toFixed(2) : '-'}</td>
-          <td class="editable" contenteditable="true">${exp.m[6] > 0 ? exp.m[6].toFixed(2) : '-'}</td>
-          <td class="editable" contenteditable="true"><span class="val-highlight">${exp.strength.toFixed(2)}</span></td>
+          <td class="editable" contenteditable="true" onblur="updateExpCell(${rowIdx}, 'ipda', this.innerText)">${exp.ipda.toFixed(2)}</td>
+          <td class="editable" contenteditable="true" onblur="updateExpCell(${rowIdx}, 'jeff', this.innerText)">${exp.jeff.toFixed(2)}</td>
+          <td class="editable" contenteditable="true" style="font-weight:600;" onblur="updateExpCell(${rowIdx}, 'r', this.innerText)">${exp.r.toFixed(2)}</td>
+          <td class="editable" contenteditable="true" onblur="updateExpMonomer(${rowIdx}, 0, this.innerText)">${exp.m[0] > 0 ? exp.m[0].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true" onblur="updateExpMonomer(${rowIdx}, 1, this.innerText)">${exp.m[1] > 0 ? exp.m[1].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true" onblur="updateExpMonomer(${rowIdx}, 2, this.innerText)">${exp.m[2] > 0 ? exp.m[2].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true" onblur="updateExpMonomer(${rowIdx}, 3, this.innerText)">${exp.m[3] > 0 ? exp.m[3].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true" onblur="updateExpMonomer(${rowIdx}, 4, this.innerText)">${exp.m[4] > 0 ? exp.m[4].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true" onblur="updateExpMonomer(${rowIdx}, 5, this.innerText)">${exp.m[5] > 0 ? exp.m[5].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true" onblur="updateExpMonomer(${rowIdx}, 6, this.innerText)">${exp.m[6] > 0 ? exp.m[6].toFixed(2) : '-'}</td>
+          <td class="editable" contenteditable="true" onblur="updateExpCell(${rowIdx}, 'strength', this.innerText)"><span class="val-highlight">${exp.strength.toFixed(2)}</span></td>
         `;
         tbody.appendChild(tr);
       });
+    }
+
+    function updateExpCell(rowIdx, field, val) {
+      let num = parseFloat(val);
+      if (!isNaN(num)) {
+        experimentData[rowIdx][field] = num;
+        trainActiveModel();
+        recalculateSimulation();
+      }
+    }
+
+    function updateExpMonomer(rowIdx, mIdx, val) {
+      let num = parseFloat(val);
+      experimentData[rowIdx].m[mIdx] = (!isNaN(num) && num > 0) ? num : 0;
+      trainActiveModel();
+      recalculateSimulation();
     }
 
     function toggleAddRowPanel() {
@@ -2107,6 +2519,8 @@
         strength: strength
       });
 
+      // Retrain the machine learning model on the newly appended data row
+      trainActiveModel();
       renderExperimentData();
       toggleAddRowPanel();
       recalculateSimulation();
@@ -2114,8 +2528,8 @@
 
     /* Initialize on load */
     window.onload = function() {
-      renderDiscoverySection();
       renderMasterDatabase();
+      trainActiveModel();
       renderExperimentData();
       recalculateSimulation();
     };
